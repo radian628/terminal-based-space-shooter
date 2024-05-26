@@ -1,3 +1,6 @@
+#pragma once
+#include <stddef.h>
+
 struct dynarray;
 
 typedef struct dynarray dynarray;
