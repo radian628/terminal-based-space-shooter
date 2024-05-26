@@ -8,4 +8,4 @@ dynarray.o: dynarray.h dynarray.c
 	gcc dynarray.c -c
 
 clean:
-	rm tbss
+	rm tbss *.o
