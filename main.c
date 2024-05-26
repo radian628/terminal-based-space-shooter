@@ -15,14 +15,37 @@ void printScreen(int min_width, int min_height) {
   if(w.ws_col < min_width || w.ws_row < min_height) {
     char msg[1024];
     sprintf(msg, "Term (%d x %d) Too Small", w.ws_col, w.ws_row);
-    for(int i = 0; i < w.ws_row/2; i++) {
-      printf("\n");
+    for(int i = 0; i < w.ws_col; i++) {
+      printf("#");
     }
-    for(int i = 0; i < w.ws_col/2 - (strlen(msg)/2); i++) {
+    for(int i = 0; i < w.ws_row/2-1; i++) {
+      printf("\n#");
+      for(int j = 0; j < w.ws_col-2; j++) {
+        printf(" ");
+      }
+      printf("#");
+    }
+    printf("\n#");
+    for(int i = 0; i < w.ws_col/2 -1- (strlen(msg)/2); i++) {
       printf(" ");
     }
     printf(msg);
-  }
+    for(int i = 0; i < w.ws_col/2 -2- (strlen(msg)/2); i++) {
+      printf(" ");
+    }
+    printf("#");
+    for(int i = 0; i < w.ws_row/2-1; i++) {
+      printf("\n#");
+      for(int j = 0; j < w.ws_col-2; j++) {
+        printf(" ");
+      }
+      printf("#");
+    }
+    printf("\n");
+    for(int i = 0; i < w.ws_col; i++) {
+      printf("#");
+    }
+   }
   fflush(stdout);
 }
 

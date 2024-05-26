@@ -1,0 +1,42 @@
+STATIC OBJECTS
+# : Immovable Wall
+|-: Breakable Wall
+0 : Coin
+= : Laser Wall (surrounded by [])
+[]: Laser Gate (same as immovable wall)
+><: Shoots bullets from wide side
+% : Floating Mine
+
+MOVING OBJECTS
++ : Bullet
+? : Shoots bullets downward while on screen, moves left-right
+~ : Small enemy, chases player
+
+SPECIAL OBJECTS
+& : Player Character
+@ : End Goal
+
+EXAMPLE LAYOUT:
+###################################
+#                                 #
+#   ~   ~   ~    @            %   #
+#                             % 0 #
+#================]            % 0 #
+#                |            %   #
+#      ~         |                #
+#                [================#
+#                                 #
+# =<                              #
+#                                 #
+#                               >=#
+#                                 #
+# % % % %                         #
+#        [===============]   ?    #
+#--------|                        #
+#           ?                     #
+#                                 #
+#                                 #
+#                                 #
+#               &                 #
+#                                 #
+###################################
