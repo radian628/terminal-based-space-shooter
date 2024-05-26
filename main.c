@@ -10,7 +10,7 @@
 #include "input.h"
 
 void printScreen(int min_width, int min_height) {
-  printf("\e[1;1H\e[2J");
+  printf("\x1B[1;1H\x1B[2J");
   fflush(stdout);
   struct winsize w;
   ioctl(0, TIOCGWINSZ, &w);
@@ -23,7 +23,7 @@ void printScreen(int min_width, int min_height) {
     for(int i = 0; i < w.ws_col/2 - (strlen(msg)/2); i++) {
       printf(" ");
     }
-    printf(msg);
+    printf("%s", msg);
   }
   fflush(stdout);
 }
@@ -34,7 +34,7 @@ int main() {
   struct termios mode;
 
   // ansi escape seq to clear the terminal (ignore keyboard spam at the end)
-  printf("\x1B[1;1H\x1B[2J asdffasdfasdasfasdd");
+  printf("\x1B[1;1H\x1B[2J");
   // int tty_file = open("/dev/tty", O_RDWR, 0);
   const char *msg = "haha stupid terminal get overwritten!";
   write(1, msg, strlen(msg));
