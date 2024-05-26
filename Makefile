@@ -5,5 +5,4 @@ tbss: $(SOURCES) $(HEADERS)
 	gcc $(SOURCES) -o tbss -g -Wpedantic 
 
 clean:
-	rm tbss
-	rm *.o
+	rm tbss *.o
