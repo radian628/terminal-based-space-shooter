@@ -4,6 +4,8 @@
 #include <string.h>
 #include <fcntl.h>
 
+#include "dynarray.h"
+
 int main() {
   // printf("Hello world!\n");
   char test[4] = "abcd";
