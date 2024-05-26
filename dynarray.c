@@ -1,3 +1,4 @@
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -6,7 +7,7 @@
 struct dynarray {
   size_t size;
   size_t capacity;
-  void *data;
+  char *data;
   size_t element_size;
 };
 
@@ -18,6 +19,7 @@ dynarray *da_create(size_t element_size) {
   da->capacity = 2;
   da->element_size = element_size;
   da->data = malloc(da->element_size * 2);
+  return da;
 }
 
 void da_free(dynarray *da) {

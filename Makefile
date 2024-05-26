@@ -1,11 +1,9 @@
-tbss: main.o dynarray.o 
-	gcc main.o dynarray.o -o tbss 
+SOURCES := $(wildcard *.c)
+HEADERS := $(wildcard *.h)
 
-main.o: dynarray.h dynarray.c
-	gcc main.c -c
-
-dynarray.o: dynarray.h dynarray.c
-	gcc dynarray.c -c
+tbss: $(SOURCES) $(HEADERS)
+	gcc $(SOURCES) -o tbss -g -Wpedantic 
 
 clean:
 	rm tbss
+	rm *.o
