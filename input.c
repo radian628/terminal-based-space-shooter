@@ -3,6 +3,7 @@
 
 #include <unistd.h>
 #include <stdio.h>
+#include <termios.h>
 
 dynarray *get_all_of_stdin() {
   dynarray *da = da_create(sizeof(char));
@@ -20,4 +21,17 @@ dynarray *get_all_of_stdin() {
     da_append(da, (void *)(&c_as_char));
   }
   return da;
+}
+
+struct termios termios_mode;
+
+void disable_echo_and_canonical() {
+  tcgetattr(0, &termios_mode);
+  termios_mode.c_lflag &= ~(ECHO | ICANON);
+  tcsetattr(0, TCSANOW, &termios_mode);
+}
+
+void enable_echo_and_canonical() {
+  termios_mode.c_lflag |= ECHO | ICANON;
+  tcsetattr(0, TCSANOW, &termios_mode);
 }
