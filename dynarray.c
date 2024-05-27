@@ -16,8 +16,6 @@ void da_create_in_place(dynarray *da, size_t element_size) {
   da->size = 0;
   da->capacity = 2;
   da->element_size = element_size;
-  printf("test?\n");
-  printf("size: %ld\n", da->element_size * 2);
   da->data = malloc(da->element_size * 2);
 }
 
@@ -103,4 +101,13 @@ size_t da_size(dynarray *da) {
 
 void *da_get_ptr(dynarray *da, size_t i) {
   return da->data + da->element_size * i;
+}
+
+int da_has(dynarray *da, void *data) {
+  for (int i = 0; i < da->size; i++) {
+    if (memcmp(da->data + i * da->element_size, data, da->element_size) == 0) {
+      return 1;
+    }
+  }
+  return 0;
 }

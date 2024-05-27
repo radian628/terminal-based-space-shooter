@@ -17,3 +17,4 @@ void *da_start(dynarray *da);
 void *da_end(dynarray *da);
 size_t da_size(dynarray *da);
 void *da_get_ptr(dynarray *da, size_t i);
+int   da_has(dynarray *da, void *data);

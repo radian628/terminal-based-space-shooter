@@ -13,19 +13,18 @@ int main() {
   // repeatedly poll for input
   while (1) {
     print_screen(80, 30);
-    sleep(1);
 
     // get all input from stdin
-    //dynarray *input = get_all_of_stdin();
+    dynarray *input = get_all_of_stdin();
 
     // write input to stdout if any exists
     //if (da_size(input))
       //write(1, da_start(input), da_size(input));
 
     // exit if user presses "x"
-    //if (((char *)da_start(input))[0] == 'x') {
-      //break;
-    //}
+    if (da_has(input, "x")) {
+      break;
+    }
     //free(input);
   }
 
