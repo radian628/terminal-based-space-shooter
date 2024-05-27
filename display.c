@@ -24,6 +24,12 @@ void init_screen() {
   next_buffer = malloc(w.ws_row * w.ws_col);
   memset(next_buffer, ' ', w.ws_row * w.ws_col);
 }
+void close_screen() {
+  free(last_buffer);
+  free(next_buffer);
+  printf("\x1B[1;1H\x1B[2J");
+  fflush(stdout);
+}
 
 void draw_size_error(char* buffer) {
   // Draw top and bottom rows
