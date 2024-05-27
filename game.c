@@ -27,8 +27,16 @@ ivec2 add(ivec2 a, ivec2 b) {
 
 int run_game_loop(game *game, dynarray *input) {
   game->player.movement_timer -= 1.0 / 60.0;
+  game->player.projectile_timer -= 1.0 / 60.0;
+
+  int should_player_fire = 0;
 
   for (char *c = da_start(input); c != da_end(input); c++) {
+    if (*c == ' ') {
+      should_player_fire = 1;
+      continue;
+    }
+
     if (*c == 'x') {
       return 1;
     }
@@ -38,6 +46,13 @@ int run_game_loop(game *game, dynarray *input) {
       game->player.dir = dir;
       continue;
     }
+  }
+
+  if (should_player_fire == 1 && game->player.projectile_timer < 0) {
+    game->player.projectile_timer = 1.0 / PLAYER_FIRE_SPEED;
+    player_projectile proj;
+    proj.pos = game->player.pos;
+    da_append(game->player_projectiles, &proj);
   }
 
   if (game->player.movement_timer < 0.0) {
@@ -54,6 +69,14 @@ int run_game_loop(game *game, dynarray *input) {
         game->player.movement_timer = 1.0 / PLAYER_SPEED;
         break;
     }
+  }
+
+  for (
+    player_projectile *pp = da_start(game->player_projectiles);
+    pp != da_end(game->player_projectiles);
+    pp++  
+  ) {
+    pp->pos.y--;
   }
   
   return 0;

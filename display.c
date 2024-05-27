@@ -83,6 +83,21 @@ void print_screen(int min_width, int min_height, game *game) {
     ) {
       next_buffer[w.ws_col * game->player.pos.y + game->player.pos.x] = 'A';
     }
+
+    for (
+      player_projectile *pp = da_start(game->player_projectiles);
+      pp != da_end(game->player_projectiles);
+      pp++  
+    ) {
+      if (
+           pp->pos.y >= 0
+        && pp->pos.y < w.ws_row
+        && pp->pos.x >= 0
+        && pp->pos.x < w.ws_col
+      ) {
+        next_buffer[w.ws_col * pp->pos.y + pp->pos.x] = '|';
+      }
+    }
   }
 
 
