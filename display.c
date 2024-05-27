@@ -48,6 +48,8 @@ void print_screen(int min_width, int min_height) {
   struct winsize w;
   ioctl(0, TIOCGWINSZ, &w);
   
+  // If screen size has changed, make new buffers, with last_buffer full of
+  // 0's so the screen redraws completely
   if(width != w.ws_col || height != w.ws_row) {
     free(next_buffer);
     next_buffer = malloc(w.ws_row * w.ws_col);
@@ -64,10 +66,11 @@ void print_screen(int min_width, int min_height) {
   }
   else{
     memset(next_buffer, ' ', w.ws_row * w.ws_col);
+
+    // DRAW STUFF HERE
+
   }
-
-  // DRAW STUFF HERE
-
+  // Copy buffer changes to screen & fflush it
   for(int i = 0; i < w.ws_row*w.ws_col; i++) {
     if(last_buffer[i] != next_buffer[i]) {
       printf("\x1B[%d;%dH%c", (i / w.ws_col) + 1, (i % w.ws_col) + 1, next_buffer[i]);
