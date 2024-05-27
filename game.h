@@ -16,11 +16,18 @@ struct player {
   ivec2 pos;
   dir dir;
   double movement_timer;
+  double projectile_timer;
 };
 typedef struct player player;
 
+struct player_projectile {
+  ivec2 pos;
+};
+typedef struct player_projectile player_projectile;
+
 struct game {
   player player;
+  dynarray *player_projectiles;
 };
 typedef struct game game;
 
