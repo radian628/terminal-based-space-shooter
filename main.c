@@ -7,6 +7,7 @@
 
 #include "dynarray.h"
 #include "input.h"
+#include "test.h"
 
 void printScreen(int min_width, int min_height) {
   printf("\x1B[1;1H\x1B[2J");
@@ -51,7 +52,7 @@ void printScreen(int min_width, int min_height) {
 }
 
 int main() {
-
+  return 0;
   // ansi escape seq to clear the terminal (ignore keyboard spam at the end)
   printf("\x1B[1;1H\x1B[2J");
   const char *msg = "haha stupid terminal get overwritten!";
