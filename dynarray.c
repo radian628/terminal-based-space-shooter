@@ -32,21 +32,23 @@ void da_free_in_place(dynarray *da) {
 void da_try_resize(dynarray *da) {
   if (da->size < da->capacity) return;
 
-  da->data = realloc(da->data, da->element_size * da->capacity * 2);
+  size_t new_capacity = da->capacity * 2;
 
-  if (da->capacity == 0) {
-    da->capacity = 1;
-  } else {
-    da->capacity *= 2;
-  }
-  
+  da->data = realloc(da->data, da->element_size * new_capacity);
+
+  da->capacity = new_capacity;
+
   return;
 }
 
 void da_append(dynarray *da, void *ptr_to_element) {
   da_try_resize(da);
 
-  memcpy(da->data + da->size * da->element_size, ptr_to_element, da->element_size);
+  memcpy(
+    da->data + da->size * da->element_size, 
+    ptr_to_element, 
+    da->element_size
+  );
 
   da->size++;
 }
@@ -76,15 +78,17 @@ void da_filter(dynarray *da, int (*filter)(void *, size_t, void *), void *closur
     // check if element should be filtered out
     int result = filter(da->data + i * da->element_size, i, closure_scope);
     if (!result) {
-      shift_by--;
+      shift_by++;
     }
   }
 
   // decrease size
-  da->size += shift_by;
+  da->size -= shift_by;
 
   // reallocate now that we've filtered out a bunch of elements 
-  da->data = realloc(da->data, da->element_size * da->size);
+  size_t new_capacity = (da->size == 0 ? 1 : da->size);
+  da->data = realloc(da->data, da->element_size * new_capacity);
+  da->capacity = new_capacity;
 }
 
 void *da_start(dynarray *da) {

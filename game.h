@@ -22,6 +22,7 @@ typedef struct player player;
 
 struct player_projectile {
   ivec2 pos;
+  int alive;
 };
 typedef struct player_projectile player_projectile;
 
@@ -34,6 +35,8 @@ struct enemy {
   ivec2 pos;
   enemy_type type;
   double time_until_fire;
+  int hitpoints;
+  int damage_animation_frames_remaining;
 };
 typedef struct enemy enemy;
 

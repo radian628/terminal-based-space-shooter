@@ -21,6 +21,7 @@ const char colors[8][10] = {"\x1B[0m", "\x1B[31m", "\x1B[32m", "\x1B[33m", "\x1B
 
 char* last_buffer = NULL;
 char* next_buffer = NULL;
+char* last_color_buffer = NULL;
 char* color_buffer = NULL;
 
 int   width = 0;
@@ -61,6 +62,27 @@ void draw_multichar(char *buffer, int w, int h, char *draw, int x, int y) {
   }
 }
 
+void set_color_rect(
+  char *buffer, int buffer_w, int buffer_h,
+  enum color color, 
+  int left, int top, int w, int h
+) {
+  for (size_t y = 0; y < h; y++) {
+    for (size_t x = 0; x < w; x++) {
+      int draw_x = left + x;
+      int draw_y = top + y;
+      if (
+           draw_x >= 0
+        && draw_x < buffer_w
+        && draw_y >= 0
+        && draw_y < buffer_h
+      ) {
+        buffer[buffer_w * draw_y + draw_x] = color;
+      }
+    }
+  }
+}
+
 
 void init_screen() {
   struct winsize w;
@@ -74,13 +96,17 @@ void init_screen() {
   memset(last_buffer, ' ', w.ws_row * w.ws_col);
   next_buffer = malloc(w.ws_row * w.ws_col);
   memset(next_buffer, ' ', w.ws_row * w.ws_col);
+
   color_buffer = malloc(w.ws_row * w.ws_col);
   memset(color_buffer, RESET, w.ws_row * w.ws_col);
+  last_color_buffer = malloc(w.ws_row * w.ws_col);
+  memset(last_color_buffer, RESET, w.ws_row * w.ws_col);
 }
 void close_screen() {
   free(last_buffer);
   free(next_buffer);
   free(color_buffer);
+  free(last_color_buffer);
   printf("\x1B[1;1H\x1B[2J");
   fflush(stdout);
 }
@@ -118,9 +144,14 @@ void print_screen(int min_width, int min_height, game *game) {
     free(last_buffer);
     last_buffer = malloc(w.ws_row * w.ws_col);
     memset(last_buffer, 0, w.ws_row * w.ws_col);
+
     free(color_buffer);
     color_buffer = malloc(w.ws_row * w.ws_col);
     memset(color_buffer, RESET, w.ws_row * w.ws_col);
+    free(last_color_buffer);
+    last_color_buffer = malloc(w.ws_row * w.ws_col);
+    memset(last_color_buffer, RESET, w.ws_row * w.ws_col);
+
     width = w.ws_col;
     height = w.ws_row;
   }
@@ -133,9 +164,6 @@ void print_screen(int min_width, int min_height, game *game) {
     memset(color_buffer, RESET, w.ws_row * w.ws_col);
 
     // DRAW STUFF HERE
-    draw_multichar(next_buffer, width, height, 
-      "TESTING\nDRAW\nMULTICHAR", 10, 10 
-    );
 
     if (
          game->player.pos.y >= 0
@@ -160,13 +188,6 @@ void print_screen(int min_width, int min_height, game *game) {
       }
     }
 
-    da_iterate(game->enemies, enemy, e) {
-      draw_multichar(
-        next_buffer, width, height,
-        "  |  \n--F--\n  |  ", e->pos.x - 2, e->pos.y - 1
-      );
-    }
-
     da_iterate(
       game->enemy_projectiles, enemy_projectile, ep
     ) {
@@ -175,14 +196,29 @@ void print_screen(int min_width, int min_height, game *game) {
         "*", ep->pos.x, ep->pos.y
       );
     }
+
+    da_iterate(game->enemies, enemy, e) {
+      draw_multichar(
+        next_buffer, width, height,
+        "  |  \n--F--\n  |  ", e->pos.x - 2, e->pos.y - 1
+      );
+
+      if (e->damage_animation_frames_remaining > 0) {
+        set_color_rect(
+          color_buffer, width, height,
+          RED, e->pos.x - 2, e->pos.y - 1, 5, 3
+        );
+      }
+    }
     
   }
 
   // Copy buffer changes to screen & fflush it
   for(int i = 0; i < w.ws_row*w.ws_col; i++) {
-    if(last_buffer[i] != next_buffer[i]) {
+    if(last_buffer[i] != next_buffer[i] || last_color_buffer[i] != color_buffer[i]) {
       printf("\x1B[%d;%dH%s%c", (i / w.ws_col) + 1, (i % w.ws_col) + 1, colors[color_buffer[i]], next_buffer[i]);
       last_buffer[i] = next_buffer[i];
+      last_color_buffer[i] = color_buffer[i];
     }
   }
   //move cursor to bottom right, reset colors

@@ -41,9 +41,11 @@ void game_init(game *game) {
 
   enemy e;
   e.type = FOUR_DIRECTIONS;
-  e.pos.x = 10;
-  e.pos.y = 20;
+  e.pos.x = 20;
+  e.pos.y = 10;
   e.time_until_fire = 0.3;
+  e.hitpoints = 3;
+  e.damage_animation_frames_remaining = 0;
   da_append(game->enemies, &e);
 }
 
@@ -76,6 +78,7 @@ int update_player(game *game, dynarray *input) {
     game->player.projectile_timer = 1.0 / PLAYER_FIRE_SPEED;
     player_projectile proj;
     proj.pos = game->player.pos;
+    proj.alive = 1;
     da_append(game->player_projectiles, &proj);
   }
 
@@ -98,12 +101,35 @@ int update_player(game *game, dynarray *input) {
   return 0;
 }
 
+int filter_dead_player_projectiles(
+  void *proj_void,
+  size_t index,
+  void *context
+) {
+  return ((player_projectile *)proj_void)->alive;
+}
+
 void update_player_projectiles(game *game) {
   da_iterate(
     game->player_projectiles, player_projectile, pp
   ) {
     pp->pos.y--;
+    if (pp->pos.y < 0) pp->alive = 0;
+    da_iterate(game->enemies, enemy, e) {
+      if (e->pos.x == pp->pos.x && e->pos.y == pp->pos.y) {
+        e->hitpoints--;
+        e->damage_animation_frames_remaining = 6;
+        pp->alive = 0;
+        break;
+      }
+    }
   }
+
+  da_filter(
+    game->player_projectiles, 
+    filter_dead_player_projectiles,
+    NULL
+  );
 }
 
 void update_enemy_projectiles(game *game) {
@@ -133,6 +159,7 @@ void update_enemies(game *game) {
       }
     }
     e->time_until_fire -= 1.0 / 60.0;
+    e->damage_animation_frames_remaining--;
   }
 }
 
