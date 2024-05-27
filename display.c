@@ -93,5 +93,7 @@ void print_screen(int min_width, int min_height, game *game) {
       last_buffer[i] = next_buffer[i];
     }
   }
+  //move cursor to bottom right
+  printf("\x1B[%d;%dH", w.ws_row, w.ws_col);
   fflush(stdout);
 }
