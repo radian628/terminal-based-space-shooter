@@ -13,6 +13,7 @@ int   height = 0;
 void init_screen() {
   struct winsize w;
   ioctl(0, TIOCGWINSZ, &w);
+  // Clear Screen
   printf("\x1B[1;1H\x1B[2J");
   fflush(stdout);
   width = w.ws_col;
@@ -24,13 +25,16 @@ void init_screen() {
 }
 
 void draw_size_error(char* buffer) {
+  // Draw top and bottom rows
   for(int i = 0; i < width; i++) {
     buffer[i] = '#';
     buffer[(height-1) * width + i] = '#';
   }
-  for(int i = 0; i < height; i++) {
-    buffer[i * height] = '#';
-    buffer[i * height + width - 1] = '#';
+
+  // Draw left and right columns
+  for(int i = 1; i < height-1; i++) {
+    buffer[i * width] = '#';
+    buffer[i * width + width - 1] = '#';
   }
 
   char msg[1024];
@@ -47,13 +51,19 @@ void print_screen(int min_width, int min_height) {
   if(width != w.ws_col || height != w.ws_row) {
     free(next_buffer);
     next_buffer = malloc(w.ws_row * w.ws_col);
-    memcpy(next_buffer, last_buffer, MIN(w.ws_col, height) * MIN(w.ws_row, width));
+    memset(next_buffer, ' ', w.ws_row * w.ws_col);
+    free(last_buffer);
+    last_buffer = malloc(w.ws_row * w.ws_col);
+    memset(last_buffer, 0, w.ws_row * w.ws_col);
+    width = w.ws_col;
+    height = w.ws_row;
   }
-  width = w.ws_col;
-  height = w.ws_row;
 
-  if(w.ws_col < min_width || w.ws_row < min_height) {
+  if(width < min_width || height < min_height) {
     draw_size_error(next_buffer);
+  }
+  else{
+    memset(next_buffer, ' ', w.ws_row * w.ws_col);
   }
 
   // DRAW STUFF HERE
