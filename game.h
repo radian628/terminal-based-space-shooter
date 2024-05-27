@@ -24,4 +24,4 @@ struct game {
 };
 typedef struct game game;
 
-void run_game_loop(game *game, dynarray *input);
+int run_game_loop(game *game, dynarray *input);

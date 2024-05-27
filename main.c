@@ -26,19 +26,14 @@ int main() {
     dynarray *input = get_all_of_stdin();
 
     // run game loop
-    run_game_loop(&game, input);
+    if(run_game_loop(&game, input)) {
+      free(input);
+      break;
+    }
 
     free(input);
-    // write input to stdout if any exists
-    //if (da_size(input))
-      //write(1, da_start(input), da_size(input));
-
-    // exit if user presses "x"
-    //if (((char *)da_start(input))[0] == 'x') {
-      //break;
-    //}
-    //free(input);
   }
+  close_screen();
 
   enable_echo_and_canonical();
 }

@@ -25,13 +25,18 @@ ivec2 add(ivec2 a, ivec2 b) {
   return v;
 }
 
-void run_game_loop(game *game, dynarray *input) {
-    game->player.movement_timer -= 1.0 / 60.0;
+int run_game_loop(game *game, dynarray *input) {
+  game->player.movement_timer -= 1.0 / 60.0;
 
     for (char *c = da_start(input); c != da_end(input); c++) {
+      if (*c == 'x') {
+        return 1;
+      }
+
       dir dir = key_to_dir(*c);
       if (dir != -1) {
         game->player.dir = dir;
+        continue;
       }
     }
 
@@ -50,4 +55,6 @@ void run_game_loop(game *game, dynarray *input) {
           break;
       }
     }
+  }
+  return 0;
 }
