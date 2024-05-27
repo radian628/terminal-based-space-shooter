@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "game.h"
 #define MIN(i, j) (((i) < (j)) ? (i) : (j))
 #define MAX(i, j) (((i) > (j)) ? (i) : (j))
 
@@ -44,7 +45,7 @@ void draw_size_error(char* buffer) {
   buffer[(height/2-1)*width + width/2 + strlen(msg)/2] = ' ';
 }
 
-void print_screen(int min_width, int min_height) {
+void print_screen(int min_width, int min_height, game *game) {
   struct winsize w;
   ioctl(0, TIOCGWINSZ, &w);
   
@@ -67,6 +68,7 @@ void print_screen(int min_width, int min_height) {
   }
 
   // DRAW STUFF HERE
+  next_buffer[w.ws_col * game->player.pos.y + game->player.pos.x] = 'A';
 
   for(int i = 0; i < w.ws_row*w.ws_col; i++) {
     if(last_buffer[i] != next_buffer[i]) {

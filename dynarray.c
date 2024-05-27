@@ -16,8 +16,6 @@ void da_create_in_place(dynarray *da, size_t element_size) {
   da->size = 0;
   da->capacity = 2;
   da->element_size = element_size;
-  printf("test?\n");
-  printf("size: %ld\n", da->element_size * 2);
   da->data = malloc(da->element_size * 2);
 }
 
