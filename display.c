@@ -69,7 +69,14 @@ void print_screen(int min_width, int min_height, game *game) {
     memset(next_buffer, ' ', w.ws_row * w.ws_col);
 
     // DRAW STUFF HERE
-    next_buffer[w.ws_col * game->player.pos.y + game->player.pos.x] = 'A';
+    if (
+         game->player.pos.y >= 0
+      && game->player.pos.y < w.ws_row
+      && game->player.pos.x >= 0
+      && game->player.pos.x < w.ws_col
+    ) {
+      next_buffer[w.ws_col * game->player.pos.y + game->player.pos.x] = 'A';
+    }
   }
 
 
