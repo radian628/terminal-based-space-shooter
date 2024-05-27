@@ -18,3 +18,10 @@ void *da_end(dynarray *da);
 size_t da_size(dynarray *da);
 void *da_get_ptr(dynarray *da, size_t i);
 int   da_has(dynarray *da, void *data);
+
+#define da_iterate(da, type_name, var_name) \
+for ( \
+  type_name *var_name = da_start(da); \
+  var_name != da_end(da); \
+  var_name++ \
+)

@@ -54,6 +54,8 @@ void draw_multichar(char *buffer, int w, int h, char *draw, int x, int y) {
       }
 
       draw_x++;
+    } else {
+      draw_x++;
     }
     draw++;
   }
@@ -145,10 +147,8 @@ void print_screen(int min_width, int min_height, game *game) {
       color_buffer[w.ws_col * game->player.pos.y + game->player.pos.x] = GREEN;
     }
 
-    for (
-      player_projectile *pp = da_start(game->player_projectiles);
-      pp != da_end(game->player_projectiles);
-      pp++  
+    da_iterate(
+      game->player_projectiles, player_projectile, pp
     ) {
       if (
            pp->pos.y >= 0
@@ -159,6 +159,23 @@ void print_screen(int min_width, int min_height, game *game) {
         next_buffer[w.ws_col * pp->pos.y + pp->pos.x] = '|';
       }
     }
+
+    da_iterate(game->enemies, enemy, e) {
+      draw_multichar(
+        next_buffer, width, height,
+        "  |  \n--F--\n  |  ", e->pos.x - 2, e->pos.y - 1
+      );
+    }
+
+    da_iterate(
+      game->enemy_projectiles, enemy_projectile, ep
+    ) {
+      draw_multichar(
+        next_buffer, width, height,
+        "*", ep->pos.x, ep->pos.y
+      );
+    }
+    
   }
 
   // Copy buffer changes to screen & fflush it

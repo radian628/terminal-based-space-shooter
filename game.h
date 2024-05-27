@@ -25,10 +25,36 @@ struct player_projectile {
 };
 typedef struct player_projectile player_projectile;
 
+enum enemy_type {
+  FOUR_DIRECTIONS
+};
+typedef enum enemy_type enemy_type;
+
+struct enemy {
+  ivec2 pos;
+  enemy_type type;
+  double time_until_fire;
+};
+typedef struct enemy enemy;
+
+struct enemy_projectile {
+  ivec2 pos;
+  ivec2 vel;
+  size_t size;
+  double movement_interval;
+  double time_until_move;
+};
+typedef struct enemy_projectile enemy_projectile;
+
 struct game {
   player player;
   dynarray *player_projectiles;
+
+  dynarray *enemies;
+  dynarray *enemy_projectiles;
 };
 typedef struct game game;
 
 int run_game_loop(game *game, dynarray *input);
+
+void game_init(game *game);
