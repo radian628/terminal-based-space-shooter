@@ -49,7 +49,7 @@ void game_init(game *game) {
 
 dir DIRS[4] = { UP, DOWN, LEFT, RIGHT };
 
-int run_game_loop(game *game, dynarray *input) {
+int update_player(game *game, dynarray *input) {
   game->player.movement_timer -= 1.0 / 60.0;
   game->player.projectile_timer -= 1.0 / 60.0;
 
@@ -95,12 +95,18 @@ int run_game_loop(game *game, dynarray *input) {
     }
   }
 
+  return 0;
+}
+
+void update_player_projectiles(game *game) {
   da_iterate(
     game->player_projectiles, player_projectile, pp
   ) {
     pp->pos.y--;
   }
+}
 
+void update_enemy_projectiles(game *game) {
   da_iterate(
     game->enemy_projectiles, enemy_projectile, ep
   ) {
@@ -110,7 +116,9 @@ int run_game_loop(game *game, dynarray *input) {
     }
     ep->time_until_move -= 1.0 / 60.0;
   }
+}
 
+void update_enemies(game *game) {
   da_iterate(game->enemies, enemy, e) {
     if (e->time_until_fire < 0) {
       e->time_until_fire = 0.6;
@@ -126,6 +134,13 @@ int run_game_loop(game *game, dynarray *input) {
     }
     e->time_until_fire -= 1.0 / 60.0;
   }
+}
+
+int run_game_loop(game *game, dynarray *input) {
+  if (update_player(game, input)) return 1;
+  update_player_projectiles(game);
+  update_enemy_projectiles(game);
+  update_enemies(game);
   
   return 0;
 }
