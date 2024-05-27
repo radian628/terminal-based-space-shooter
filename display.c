@@ -6,10 +6,27 @@
 #define MIN(i, j) (((i) < (j)) ? (i) : (j))
 #define MAX(i, j) (((i) > (j)) ? (i) : (j))
 
+enum color {
+  RESET,
+  RED,
+  GREEN,
+  YELLOW,
+  BLUE,
+  MAGENTA,
+  CYAN,
+  WHITE
+};
+
+const char colors[8][10] = {"\x1B[0m", "\x1B[31m", "\x1B[32m", "\x1B[33m", "\x1B[34m", "\x1B[35m", "\x1B[36m", "\x1B[37m"};
+
 char* last_buffer = NULL;
 char* next_buffer = NULL;
+char* color_buffer = NULL;
+
 int   width = 0;
 int   height = 0;
+
+
 
 void init_screen() {
   struct winsize w;
@@ -23,10 +40,13 @@ void init_screen() {
   memset(last_buffer, ' ', w.ws_row * w.ws_col);
   next_buffer = malloc(w.ws_row * w.ws_col);
   memset(next_buffer, ' ', w.ws_row * w.ws_col);
+  color_buffer = malloc(w.ws_row * w.ws_col);
+  memset(color_buffer, RESET, w.ws_row * w.ws_col);
 }
 void close_screen() {
   free(last_buffer);
   free(next_buffer);
+  free(color_buffer);
   printf("\x1B[1;1H\x1B[2J");
   fflush(stdout);
 }
@@ -64,6 +84,9 @@ void print_screen(int min_width, int min_height, game *game) {
     free(last_buffer);
     last_buffer = malloc(w.ws_row * w.ws_col);
     memset(last_buffer, 0, w.ws_row * w.ws_col);
+    free(color_buffer);
+    color_buffer = malloc(w.ws_row * w.ws_col);
+    memset(color_buffer, RESET, w.ws_row * w.ws_col);
     width = w.ws_col;
     height = w.ws_row;
   }
@@ -73,6 +96,7 @@ void print_screen(int min_width, int min_height, game *game) {
   }
   else{
     memset(next_buffer, ' ', w.ws_row * w.ws_col);
+    memset(color_buffer, RESET, w.ws_row * w.ws_col);
 
     // DRAW STUFF HERE
     if (
@@ -82,18 +106,18 @@ void print_screen(int min_width, int min_height, game *game) {
       && game->player.pos.x < w.ws_col
     ) {
       next_buffer[w.ws_col * game->player.pos.y + game->player.pos.x] = 'A';
+      color_buffer[w.ws_col * game->player.pos.y + game->player.pos.x] = GREEN;
     }
   }
-
 
   // Copy buffer changes to screen & fflush it
   for(int i = 0; i < w.ws_row*w.ws_col; i++) {
     if(last_buffer[i] != next_buffer[i]) {
-      printf("\x1B[%d;%dH%c", (i / w.ws_col) + 1, (i % w.ws_col) + 1, next_buffer[i]);
+      printf("\x1B[%d;%dH%s%c", (i / w.ws_col) + 1, (i % w.ws_col) + 1, colors[color_buffer[i]], next_buffer[i]);
       last_buffer[i] = next_buffer[i];
     }
   }
-  //move cursor to bottom right
-  printf("\x1B[%d;%dH", w.ws_row, w.ws_col);
+  //move cursor to bottom right, reset colors
+  printf("\x1B[%d;%dH%s", w.ws_row, w.ws_col, colors[RESET]);
   fflush(stdout);
 }
