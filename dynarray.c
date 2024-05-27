@@ -1,30 +1,33 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "dynarray.h"
-
-struct dynarray {
-  size_t size;
-  size_t capacity;
-  char *data;
-  size_t element_size;
-};
-
-typedef struct dynarray dynarray;
+#include "dynarray_impl.h"
 
 dynarray *da_create(size_t element_size) {
   dynarray *da = malloc(sizeof(dynarray));
+  da_create_in_place(da, element_size);
+  return da;
+}
+
+void da_create_in_place(dynarray *da, size_t element_size) {
   da->size = 0;
   da->capacity = 2;
   da->element_size = element_size;
+  printf("test?\n");
+  printf("size: %ld\n", da->element_size * 2);
   da->data = malloc(da->element_size * 2);
-  return da;
 }
 
 void da_free(dynarray *da) {
   free(da->data);
   free(da);
+}
+
+void da_free_in_place(dynarray *da) {
+  free(da->data);
 }
 
 // run this BEFORE changing the size
@@ -33,7 +36,11 @@ void da_try_resize(dynarray *da) {
 
   da->data = realloc(da->data, da->element_size * da->capacity * 2);
 
-  da->capacity *= 2;
+  if (da->capacity == 0) {
+    da->capacity = 1;
+  } else {
+    da->capacity *= 2;
+  }
   
   return;
 }
@@ -46,9 +53,15 @@ void da_append(dynarray *da, void *ptr_to_element) {
   da->size++;
 }
 
+void *da_reserve_at_end(dynarray *da) {
+  da_try_resize(da);
+  da->size++;
+  return da->data + da->element_size * (da->size - 1);
+}
+
 // filter function has two params:
 // 1: pointer to element, 2: closure scope
-void da_filter(dynarray *da, int (*filter)(void *, void *), void *closure_scope) {
+void da_filter(dynarray *da, int (*filter)(void *, size_t, void *), void *closure_scope) {
   int64_t shift_by = 0;
 
   for (int i = 0; i < da->size; i++) {
@@ -63,7 +76,7 @@ void da_filter(dynarray *da, int (*filter)(void *, void *), void *closure_scope)
     }
 
     // check if element should be filtered out
-    int result = filter(da->data + i * da->element_size, closure_scope);
+    int result = filter(da->data + i * da->element_size, i, closure_scope);
     if (!result) {
       shift_by--;
     }
@@ -86,4 +99,8 @@ void *da_end(dynarray *da) {
 
 size_t da_size(dynarray *da) {
   return da->size;
+}
+
+void *da_get_ptr(dynarray *da, size_t i) {
+  return da->data + da->element_size * i;
 }
