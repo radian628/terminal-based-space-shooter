@@ -26,6 +26,38 @@ char* color_buffer = NULL;
 int   width = 0;
 int   height = 0;
 
+void draw_multichar(char *buffer, int w, int h, char *draw, int x, int y) {
+  int draw_x = x;
+  int draw_y = y;
+  while (*draw != '\0') {
+    // newline -> go down and reset x
+    if (*draw == '\n') {
+      draw_x = x;
+      draw_y++;
+
+      // bottom of screen -> can't draw any more
+      if (draw_y >= h) return;
+
+    } else if (
+      // draw anything that isn't a space
+      *draw != ' '
+    ) {
+      
+      // bounds checking
+      if (
+           draw_x >= 0
+        && draw_y >= 0
+        && draw_x < w
+        && draw_y < h
+      ) {
+        buffer[draw_y * w + draw_x] = *draw;
+      }
+
+      draw_x++;
+    }
+    draw++;
+  }
+}
 
 
 void init_screen() {
@@ -99,6 +131,10 @@ void print_screen(int min_width, int min_height, game *game) {
     memset(color_buffer, RESET, w.ws_row * w.ws_col);
 
     // DRAW STUFF HERE
+    draw_multichar(next_buffer, width, height, 
+      "TESTING\nDRAW\nMULTICHAR", 10, 10 
+    );
+
     if (
          game->player.pos.y >= 0
       && game->player.pos.y < w.ws_row
