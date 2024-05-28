@@ -109,7 +109,7 @@ parseFile(char *filename, game *g) {
                     g->level->statics_map[i * g->level->width + k] = 10;
                     break;
                 // Non static entities:
-                case 'F':
+                case 'F': {
                     enemy e;
                     e.pos.x = k;
                     e.pos.y = i;
@@ -119,7 +119,8 @@ parseFile(char *filename, game *g) {
                     e.damage_animation_frames_remaining = 0;
                     dynarray_push(g->enemies, &e);
                     break;
-                case '~':
+                }
+                case '~': {
                     enemy e;
                     e.pos.x = k;
                     e.pos.y = i;
@@ -129,7 +130,8 @@ parseFile(char *filename, game *g) {
                     e.damage_animation_frames_remaining = 0;
                     dynarray_push(g->enemies, &e);
                     break;
-                case '?':
+                }
+                case '?': {
                     enemy e;
                     e.pos.x = k;
                     e.pos.y = i;
@@ -138,6 +140,7 @@ parseFile(char *filename, game *g) {
                     e.hitpoints = 3;
                     e.damage_animation_frames_remaining = 0;
                     dynarray_push(g->enemies, &e);
+                }
                 default:
                     g->level->statics_map[i * g->level->width + k] = 0;
                     break;
