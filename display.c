@@ -247,6 +247,22 @@ void print_screen(int min_width, int min_height, game *game) {
         4 + i, 0
       );
     }
+
+    for (int i = 0; i < game->level->width; i++) {
+      draw_multichar(
+        next_buffer, width, height,
+        "X", i, GAME_HEIGHT 
+      );
+    }
+    set_color_rect(
+      color_buffer, width, height,
+      WHITE, 0, GAME_HEIGHT, game->level->width, 1
+    );
+
+    // clear out everything below game bounds
+    for (int i = width * (GAME_HEIGHT + 1); i < width * height; i++) {
+      next_buffer[i] = ' ';
+    }
   }
 
   // Copy buffer changes to screen & fflush it
