@@ -29,7 +29,9 @@ struct player_projectile {
 typedef struct player_projectile player_projectile;
 
 enum enemy_type {
-  FOUR_DIRECTIONS
+  FOUR_DIRECTIONS,
+  FOLLOWER,
+  DOWN_SHOOTER
 };
 typedef enum enemy_type enemy_type;
 

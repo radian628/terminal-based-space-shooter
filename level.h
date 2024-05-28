@@ -1,4 +1,5 @@
 #pragma once
+#include "game.h"
 
 // statics_map key:
 // 0 = space
@@ -26,4 +27,4 @@ struct level {
 };
 typedef struct level level;
 
-level* parseFile(char *filename);
+level* parseFile(char *filename, game *g);

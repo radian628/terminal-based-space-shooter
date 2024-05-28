@@ -2,17 +2,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "game.h"
+
 struct level {
     int width;
     int height;
-    char *statics_bitmap;
+    char *statics_map;
 };
 
 
-struct level* parseFile(char *filename) {
-    struct level *lvl = malloc(sizeof(struct level));
+parseFile(char *filename, game *g) {
+    g->level = malloc(sizeof(struct level));
     FILE *f = fopen(filename, "r");
-    lvl->height = 0;
+    g->level->height = 0;
     if (f == NULL) {
         printf("Error opening file %s\n", filename);
         return NULL;
@@ -21,7 +23,7 @@ struct level* parseFile(char *filename) {
     int ch=0;
     while((ch = fgetc(f)) != EOF) {
         if(ch == '\n')
-            lvl->height++;
+            g->level->height++;
     }
     fclose(f);
     // Reset file pointer
@@ -37,15 +39,16 @@ struct level* parseFile(char *filename) {
     }
 
     char* cmd = strtok(buffer, " ");
-    lvl->width = 0;
+    g->level->width = 0;
     while (cmd != NULL) {
         if(strcmp(cmd, "width") == 0) {
-            lvl->width = atoi(strtok(NULL, " "));
+            g->level->width = atoi(strtok(NULL, " "));
+            g->level_progress = -(double)g->level->height;
         } else if(strcmp(cmd, "level") == 0) {
             break;
         } // Add other supported parameters here
         else if(strcmp(cmd, "\n") == 0 || strcmp(cmd, "\r\n") == 0) {
-            lvl->height--;
+            g->level->height--;
         }
         else {
             printf("Unknown command: %s\n", cmd);
@@ -60,68 +63,97 @@ struct level* parseFile(char *filename) {
         cmd = strtok(buffer, " ");
     }
     //Trailing Thingamabob
-    lvl->height--;
+    g->level->height--;
 
     // It breaks when I take out this debug statement. I'm going to sleep.
-    printf("Width: %d, Height: %d\n", lvl->width, lvl->height);
-    char* temp = realloc(buffer, lvl->width);
+    printf("Width: %d, Height: %d\n", g->level->width, g->level->height);
+    char* temp = realloc(buffer, g->level->width);
     if(temp == NULL) {
         printf("Failed to realloc\n");
         return NULL;
     } else {
         buffer = temp;
     }
-    lvl->statics_bitmap = malloc(lvl->height * lvl->width);
+    g->level->statics_map = malloc(g->level->height * g->level->width);
     // Level parsing:
-    for(int i = 0; i < lvl->height; i++) {
+    for(int i = 0; i < g->level->height; i++) {
         size_t j = 0;
-        memset(buffer, ' ', lvl->width);
-        memset(lvl->statics_bitmap + i * lvl->width, 0, lvl->width);
+        memset(buffer, ' ', g->level->width);
+        memset(g->level->statics_map + i * g->level->width, 0, g->level->width);
         getline(&buffer, &j, f);
         for(int k = 0; k < j; k++) {
             switch (buffer[k]) {
                 case '#':
-                    lvl->statics_bitmap[i * lvl->width + k] = 1;
+                    g->level->statics_map[i * g->level->width + k] = 1;
                     break;
                 case '=':
-                    lvl->statics_bitmap[i * lvl->width + k] = 2;
+                    g->level->statics_map[i * g->level->width + k] = 2;
                     break;
                 case '[':
-                    lvl->statics_bitmap[i * lvl->width + k] = 3;
+                    g->level->statics_map[i * g->level->width + k] = 3;
                     break;
                 case '-':
-                    lvl->statics_bitmap[i * lvl->width + k] = 4;
+                    g->level->statics_map[i * g->level->width + k] = 4;
                     break;
                 case ']':
-                    lvl->statics_bitmap[i * lvl->width + k] = 5;
+                    g->level->statics_map[i * g->level->width + k] = 5;
                     break;
                 case '|':
-                    lvl->statics_bitmap[i * lvl->width + k] = 6;
+                    g->level->statics_map[i * g->level->width + k] = 6;
                     break;
                 case '>':
-                    lvl->statics_bitmap[i * lvl->width + k] = 7;
+                    g->level->statics_map[i * g->level->width + k] = 7;
                     break;
                 case '%':
-                    lvl->statics_bitmap[i * lvl->width + k] = 8;
+                    g->level->statics_map[i * g->level->width + k] = 8;
                     break;
                 case '<':
-                    lvl->statics_bitmap[i * lvl->width + k] = 9;
+                    g->level->statics_map[i * g->level->width + k] = 9;
                     break;
                 case '0':
-                    lvl->statics_bitmap[i * lvl->width + k] = 10;
+                    g->level->statics_map[i * g->level->width + k] = 10;
                     break;
+                // Non static entities:
+                case 'F':
+                    enemy e;
+                    e.pos.x = k;
+                    e.pos.y = i;
+                    e.type = FOUR_DIRECTIONS;
+                    e.time_until_fire = 0.3;
+                    e.hitpoints = 3;
+                    e.damage_animation_frames_remaining = 0;
+                    dynarray_push(g->enemies, &e);
+                    break;
+                case '~':
+                    enemy e;
+                    e.pos.x = k;
+                    e.pos.y = i;
+                    e.type = FOLLOWER;
+                    e.time_until_fire = 0;
+                    e.hitpoints = 1;
+                    e.damage_animation_frames_remaining = 0;
+                    dynarray_push(g->enemies, &e);
+                    break;
+                case '?':
+                    enemy e;
+                    e.pos.x = k;
+                    e.pos.y = i;
+                    e.type = DOWN_SHOOTER;
+                    e.time_until_fire = 0.3;
+                    e.hitpoints = 3;
+                    e.damage_animation_frames_remaining = 0;
+                    dynarray_push(g->enemies, &e);
                 default:
-                    lvl->statics_bitmap[i * lvl->width + k] = 0;
+                    g->level->statics_map[i * g->level->width + k] = 0;
                     break;
             }
         }
     }
-    for(int i = 0; i < lvl->height; i++) {
-        for(int j = 0; j < lvl->width; j++) {
-            printf("%d ", lvl->statics_bitmap[i * lvl->width + j]);
+    for(int i = 0; i < g->level->height; i++) {
+        for(int j = 0; j < g->level->width; j++) {
+            printf("%d ", g->level->statics_map[i * g->level->width + j]);
         }
         printf("\n");
     }
     fclose(f);
-    return lvl;
 }

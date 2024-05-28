@@ -14,9 +14,7 @@ int main( int argc, char *argv[] ) {
   game game;
   game_init(&game);
   if(argc > 1) {
-    game.level = parseFile(argv[1]);
-    game.level_progress
-      = -(double)game.level->height;
+    parseFile(argv[1], &game);
   }else{
     printf("No level specified.\n");
     exit(1);
@@ -26,7 +24,7 @@ int main( int argc, char *argv[] ) {
   // repeatedly poll for input
   while (1) {
     // Min height? 30 for now.
-    print_screen(game.level->width, 30, &game);
+    print_screen(game.level->width, 10, &game);
     usleep(1000000 / 60);
 
     // get all input from stdin
