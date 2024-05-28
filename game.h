@@ -1,6 +1,8 @@
 #pragma once
 #include "dynarray.h"
-#include "level.h"
+
+struct level;
+typedef struct level level;
 
 enum game_loop_result {
   NORMAL, DEATH, EXIT

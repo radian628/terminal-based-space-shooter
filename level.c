@@ -2,13 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "level.h"
 #include "game.h"
-
-struct level {
-    int width;
-    int height;
-    char *statics_map;
-};
 
 
 parseFile(char *filename, game *g) {

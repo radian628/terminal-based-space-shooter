@@ -1,5 +1,6 @@
 #include "game.h"
 #include "config.h"
+#include "level.h"
 
 dir key_to_dir(char key) {
   switch (key) {\

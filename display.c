@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "game.h"
 #include "config.h"
+#include "level.h"
 
 #define MIN(i, j) (((i) < (j)) ? (i) : (j))
 #define MAX(i, j) (((i) > (j)) ? (i) : (j))
