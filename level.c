@@ -143,6 +143,7 @@ void parseFile(char *filename, game *g) {
                     e.time_until_fire = 0.3;
                     e.hitpoints = 3;
                     e.damage_animation_frames_remaining = 0;
+                    e.dir = LEFT;
                     da_append(g->enemies, &e);
                 }
                 default:

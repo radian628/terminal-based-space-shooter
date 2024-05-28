@@ -241,8 +241,8 @@ int filter_dead_enemies(
   return ((enemy *)enemy_void)->hitpoints > 0;
 }
 
-void update_enemies(game *game) {
-  da_iterate(game->enemies, enemy, e) {
+void update_enemy(game *game, enemy *e) {
+  if (e->type == FOUR_DIRECTIONS) {
     if (e->time_until_fire < 0) {
       e->time_until_fire = 0.6;
       for (size_t i = 0; i < 4; i++) {
@@ -257,8 +257,35 @@ void update_enemies(game *game) {
         da_append(game->enemy_projectiles, &proj);
       }
     }
-    e->time_until_fire -= 1.0 / 60.0;
-    e->damage_animation_frames_remaining--;
+  } else if (e->type == DOWN_SHOOTER) {
+    if (e->time_until_fire < 0) {
+      e->time_until_fire = 0.5;
+      enemy_projectile proj;
+      proj.pos = e->pos;
+      proj.vel.x = 0;
+      proj.vel.y = 1;
+      proj.size = 1;
+      proj.movement_interval = 0.0125;
+      proj.time_until_move = 0.0;
+      proj.alive = 1;
+      proj.damage = 3;
+      da_append(game->enemy_projectiles, &proj);
+    }
+
+    e->pos = add(e->pos, dir_to_ivec2(e->dir));
+    if (is_position_intersecting_level(game, e->pos)) {
+      e->dir = e->dir == LEFT ? RIGHT : LEFT;
+      e->pos = add(e->pos, dir_to_ivec2(e->dir));
+    }
+  }
+  
+  e->time_until_fire -= 1.0 / 60.0;
+  e->damage_animation_frames_remaining--;
+}
+
+void update_enemies(game *game) {
+  da_iterate(game->enemies, enemy, e) {
+    update_enemy(game, e);
   }
 
   da_filter(

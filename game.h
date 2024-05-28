@@ -48,6 +48,8 @@ struct enemy {
   double time_until_fire;
   int hitpoints;
   int damage_animation_frames_remaining;
+  dir dir;
+  double time_until_move;
 };
 typedef struct enemy enemy;
 
