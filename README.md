@@ -1,2 +1,9 @@
 # terminal-based-space-shooter
- change the name later stupid
+
+Terminal-based space shooter game that runs in a linux terminal.
+
+## Instructions
+
+Compile with `make`
+
+Run an example level with `./tbss levels/example.txt`

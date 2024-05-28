@@ -38,9 +38,38 @@ int in_rect(int test_x, int test_y, int x, int y, int w, int h) {
   return between(test_x, x, x + w) && between(test_y, y, y + h);
 }
 
+int is_position_intersecting_level(game *game, ivec2 pos) {
+  level *level = game->level;
+  int x = pos.x;
+  int y = pos.y - (int)game->level_progress;
+  if (
+    x < 0 || x >= level->width
+    || pos.y < 0 || pos.y > GAME_HEIGHT
+  ) {
+    return 1;
+  }
+
+  if (
+    y < 0 || y >= level->height
+  ) {
+    return 0;
+  }
+
+  int i = y * level->width + x;
+
+  char block = level->statics_map[i];
+
+  // odd -> takes up space
+  return block != 0;
+}
+
+int is_player_intersecting_level(game *game) {
+  return is_position_intersecting_level(game, game->player.pos);
+}
+
 void game_init(game *game) {
-  game->player.pos.x = 0;
-  game->player.pos.y = 0;
+  game->player.pos.x = 40;
+  game->player.pos.y = GAME_HEIGHT / 2;
   game->player.hitpoints = 20;
   game->player.dir = RIGHT;
   game->player.movement_timer = 0.1;
@@ -61,7 +90,10 @@ void game_init(game *game) {
 
 dir DIRS[4] = { UP, DOWN, LEFT, RIGHT };
 
-int update_player(game *game, dynarray *input) {
+game_loop_result update_player(game *game, dynarray *input) {
+  if (game->player.pos.y >= GAME_HEIGHT)
+    game->player.hitpoints = 0;
+
   game->player.movement_timer -= 1.0 / 60.0;
   game->player.projectile_timer -= 1.0 / 60.0;
 
@@ -74,7 +106,7 @@ int update_player(game *game, dynarray *input) {
     }
 
     if (*c == 'x') {
-      return 1;
+      return EXIT;
     }
 
     dir dir = key_to_dir(*c);
@@ -92,10 +124,22 @@ int update_player(game *game, dynarray *input) {
     da_append(game->player_projectiles, &proj);
   }
 
+  // make sure we're not intersecting a wall   
+  while (is_player_intersecting_level(game)) {
+    game->player.pos.y++;
+  }
+
   if (game->player.movement_timer < 0.0) {
+    ivec2 old_pos = game->player.pos;
     game->player.pos = add(game->player.pos, dir_to_ivec2(
       game->player.dir
     ));
+    if (is_player_intersecting_level(game)) {
+      game->player.pos = old_pos;
+    }
+    while (is_player_intersecting_level(game)) {
+      game->player.pos.y++;
+    }
     switch (game->player.dir) {
       case UP:
       case DOWN:
@@ -108,7 +152,7 @@ int update_player(game *game, dynarray *input) {
     }
   }
 
-  return 0;
+  return NORMAL;
 }
 
 int filter_dead_player_projectiles(
@@ -136,6 +180,10 @@ void update_player_projectiles(game *game) {
         pp->alive = 0;
         break;
       }
+    }
+
+    if (is_position_intersecting_level(game, pp->pos)) {
+      pp->alive = 0;
     }
   }
 
@@ -170,6 +218,10 @@ void update_enemy_projectiles(game *game) {
       ep->alive = 0;
       game->player.hitpoints -= ep->damage;
       continue;
+    }
+
+    if (is_position_intersecting_level(game, ep->pos)) {
+      ep->alive = 0;
     }
   }
 
@@ -215,8 +267,8 @@ void update_enemies(game *game) {
   );
 }
 
-int run_game_loop(game *game, dynarray *input) {
-  if (update_player(game, input)) return 1;
+game_loop_result run_game_loop(game *game, dynarray *input) {
+  if (update_player(game, input) == EXIT) return EXIT;
   update_player_projectiles(game);
   update_enemy_projectiles(game);
   update_enemies(game);
@@ -233,6 +285,6 @@ int run_game_loop(game *game, dynarray *input) {
       e->pos.y++;
     }
   }
-  
-  return 0;
+
+  return game->player.hitpoints <= 0 ? DEATH : NORMAL;  
 }

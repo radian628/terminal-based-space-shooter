@@ -3,6 +3,8 @@
 #include <string.h>
 #include <stdio.h>
 #include "game.h"
+#include "config.h"
+
 #define MIN(i, j) (((i) < (j)) ? (i) : (j))
 #define MAX(i, j) (((i) > (j)) ? (i) : (j))
 
@@ -221,6 +223,7 @@ void print_screen(int min_width, int min_height, game *game) {
     // );
     level *level = game->level;
     for (int y = 0; y < level->height; y++) {
+      if (y + (int)game->level_progress > GAME_HEIGHT) break;
       for (int x = 0; x < level->width; x++) {
         int i = y * level->width + x;
         if (level->statics_map[i]) {
@@ -243,6 +246,22 @@ void print_screen(int min_width, int min_height, game *game) {
         i >= game->player.hitpoints ? "_" : "|",
         4 + i, 0
       );
+    }
+
+    for (int i = 0; i < game->level->width; i++) {
+      draw_multichar(
+        next_buffer, width, height,
+        "X", i, GAME_HEIGHT 
+      );
+    }
+    set_color_rect(
+      color_buffer, width, height,
+      WHITE, 0, GAME_HEIGHT, game->level->width, 1
+    );
+
+    // clear out everything below game bounds
+    for (int i = width * (GAME_HEIGHT + 1); i < width * height; i++) {
+      next_buffer[i] = ' ';
     }
   }
 
