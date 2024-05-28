@@ -27,4 +27,4 @@ struct level {
 };
 typedef struct level level;
 
-level* parseFile(char *filename, game *g);
+void parseFile(char *filename, game *g);
