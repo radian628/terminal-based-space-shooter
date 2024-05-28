@@ -164,7 +164,7 @@ void print_screen(int min_width, int min_height, game *game) {
     memset(color_buffer, RESET, w.ws_row * w.ws_col);
 
     // DRAW STUFF HERE
-
+    // draw player
     if (
          game->player.pos.y >= 0
       && game->player.pos.y < w.ws_row
@@ -175,6 +175,7 @@ void print_screen(int min_width, int min_height, game *game) {
       color_buffer[w.ws_col * game->player.pos.y + game->player.pos.x] = GREEN;
     }
 
+    // draw player projectiles
     da_iterate(
       game->player_projectiles, player_projectile, pp
     ) {
@@ -188,6 +189,7 @@ void print_screen(int min_width, int min_height, game *game) {
       }
     }
 
+    // draw enemy projectiles
     da_iterate(
       game->enemy_projectiles, enemy_projectile, ep
     ) {
@@ -197,6 +199,7 @@ void print_screen(int min_width, int min_height, game *game) {
       );
     }
 
+    // draw enemies
     da_iterate(game->enemies, enemy, e) {
       draw_multichar(
         next_buffer, width, height,
@@ -209,6 +212,19 @@ void print_screen(int min_width, int min_height, game *game) {
           RED, e->pos.x - 2, e->pos.y - 1, 5, 3
         );
       }
+    }
+
+    // draw hud
+    draw_multichar(
+      next_buffer, width, height,
+      "HP: ", 0, 0
+    );
+    for (int i = 0; i < 20; i++) {
+      draw_multichar(
+        next_buffer, width, height,
+        i >= game->player.hitpoints ? "_" : "#",
+        4 + i, 0
+      );
     }
     
   }

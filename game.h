@@ -17,6 +17,7 @@ struct player {
   dir dir;
   double movement_timer;
   double projectile_timer;
+  int hitpoints;
 };
 typedef struct player player;
 
@@ -46,6 +47,8 @@ struct enemy_projectile {
   size_t size;
   double movement_interval;
   double time_until_move;
+  int damage;
+  int alive;
 };
 typedef struct enemy_projectile enemy_projectile;
 

@@ -33,6 +33,7 @@ ivec2 add(ivec2 a, ivec2 b) {
 void game_init(game *game) {
   game->player.pos.x = 0;
   game->player.pos.y = 0;
+  game->player.hitpoints = 20;
   game->player.dir = RIGHT;
   game->player.movement_timer = 0.1;
   game->player_projectiles = da_create(sizeof(player_projectile));
@@ -132,6 +133,14 @@ void update_player_projectiles(game *game) {
   );
 }
 
+int filter_dead_enemy_projectiles(
+  void *eproj_void,
+  size_t index,
+  void *context
+) {
+  return ((enemy_projectile *)eproj_void)->alive;
+}
+
 void update_enemy_projectiles(game *game) {
   da_iterate(
     game->enemy_projectiles, enemy_projectile, ep
@@ -141,7 +150,29 @@ void update_enemy_projectiles(game *game) {
       ep->time_until_move = ep->movement_interval;
     }
     ep->time_until_move -= 1.0 / 60.0;
+
+    // collision with player
+    if (ep->pos.x == game->player.pos.x 
+    && ep->pos.y == game->player.pos.y) {
+      ep->alive = 0;
+      game->player.hitpoints -= ep->damage;
+      continue;
+    }
   }
+
+  da_filter(
+    game->enemy_projectiles,
+    filter_dead_enemy_projectiles,
+    NULL
+  );
+}
+
+int filter_dead_enemies(
+  void *enemy_void,
+  size_t index,
+  void *context
+) {
+  return ((enemy *)enemy_void)->hitpoints > 0;
 }
 
 void update_enemies(game *game) {
@@ -155,12 +186,20 @@ void update_enemies(game *game) {
         proj.size = 1;
         proj.movement_interval = 0.025 * dir_multiplier(DIRS[i]);
         proj.time_until_move = 0.0;
+        proj.alive = 1;
+        proj.damage = 4;
         da_append(game->enemy_projectiles, &proj);
       }
     }
     e->time_until_fire -= 1.0 / 60.0;
     e->damage_animation_frames_remaining--;
   }
+
+  da_filter(
+    game->enemies,
+    filter_dead_enemies,
+    NULL
+  );
 }
 
 int run_game_loop(game *game, dynarray *input) {
