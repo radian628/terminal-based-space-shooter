@@ -25,3 +25,5 @@ struct level {
     char *statics_map;
 };
 typedef struct level level;
+
+level* parseFile(char *filename);
