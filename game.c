@@ -83,7 +83,7 @@ void game_init(game *game) {
 
 dir DIRS[4] = { UP, DOWN, LEFT, RIGHT };
 
-int update_player(game *game, dynarray *input) {
+game_loop_result update_player(game *game, dynarray *input) {
   game->player.movement_timer -= 1.0 / 60.0;
   game->player.projectile_timer -= 1.0 / 60.0;
 
@@ -96,7 +96,7 @@ int update_player(game *game, dynarray *input) {
     }
 
     if (*c == 'x') {
-      return 1;
+      return EXIT;
     }
 
     dir dir = key_to_dir(*c);
@@ -142,7 +142,7 @@ int update_player(game *game, dynarray *input) {
     }
   }
 
-  return 0;
+  return NORMAL;
 }
 
 int filter_dead_player_projectiles(
@@ -257,8 +257,8 @@ void update_enemies(game *game) {
   );
 }
 
-int run_game_loop(game *game, dynarray *input) {
-  if (update_player(game, input)) return 1;
+game_loop_result run_game_loop(game *game, dynarray *input) {
+  if (update_player(game, input) == EXIT) return EXIT;
   update_player_projectiles(game);
   update_enemy_projectiles(game);
   update_enemies(game);
@@ -275,6 +275,6 @@ int run_game_loop(game *game, dynarray *input) {
       e->pos.y++;
     }
   }
-  
-  return 0;
+
+  return game->player.hitpoints <= 0 ? DEATH : NORMAL;  
 }

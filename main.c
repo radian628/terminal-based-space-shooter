@@ -12,6 +12,7 @@
 int main( int argc, char *argv[] ) {
 
   game game;
+  game_loop_result result; 
   game_init(&game);
   if(argc > 1) {
     game.level = parseFile(argv[1]);
@@ -33,7 +34,8 @@ int main( int argc, char *argv[] ) {
     dynarray *input = get_all_of_stdin();
 
     // run game loop
-    if(run_game_loop(&game, input)) {
+    result = run_game_loop(&game, input);
+    if (result != NORMAL) {
       da_free(input);
       break;
     }
@@ -43,4 +45,8 @@ int main( int argc, char *argv[] ) {
   close_screen();
 
   enable_echo_and_canonical();
+
+  if (result == DEATH) {
+    printf("You died!\n");
+  }
 }

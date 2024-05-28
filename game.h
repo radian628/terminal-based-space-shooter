@@ -2,6 +2,11 @@
 #include "dynarray.h"
 #include "level.h"
 
+enum game_loop_result {
+  NORMAL, DEATH, EXIT
+};
+typedef enum game_loop_result game_loop_result;
+
 enum dir {
   UP, DOWN, LEFT, RIGHT
 };
@@ -63,7 +68,7 @@ struct game {
 };
 typedef struct game game;
 
-int run_game_loop(game *game, dynarray *input);
+game_loop_result run_game_loop(game *game, dynarray *input);
 
 void game_init(game *game);
 
