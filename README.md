@@ -1,2 +1,7 @@
 # terminal-based-space-shooter
- change the name later stupid
+
+## Instructions
+
+Compile with `make`
+
+Run an example level with `./tbss levels/example.txt`
