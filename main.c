@@ -7,6 +7,7 @@
 #include "input.h"
 #include "display.h"
 #include "game.h"
+#include "config.h"
 
 
 int main( int argc, char *argv[] ) {
@@ -27,7 +28,7 @@ int main( int argc, char *argv[] ) {
   // repeatedly poll for input
   while (1) {
     // Min height? 30 for now.
-    print_screen(game.level->width, 30, &game);
+    print_screen(game.level->width, GAME_HEIGHT, &game);
     usleep(1000000 / 60);
 
     // get all input from stdin

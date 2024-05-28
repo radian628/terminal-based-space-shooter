@@ -43,7 +43,14 @@ int is_position_intersecting_level(game *game, ivec2 pos) {
   int x = pos.x;
   int y = pos.y - (int)game->level_progress;
   if (
-    x < 0 || y < 0 || x >= level->width || y >= level->height
+    x < 0 || x >= level->width
+    || pos.y < 0 || pos.y > GAME_HEIGHT
+  ) {
+    return 1;
+  }
+
+  if (
+    y < 0 || y >= level->height
   ) {
     return 0;
   }
@@ -61,8 +68,8 @@ int is_player_intersecting_level(game *game) {
 }
 
 void game_init(game *game) {
-  game->player.pos.x = 0;
-  game->player.pos.y = 0;
+  game->player.pos.x = 40;
+  game->player.pos.y = GAME_HEIGHT / 2;
   game->player.hitpoints = 20;
   game->player.dir = RIGHT;
   game->player.movement_timer = 0.1;
@@ -84,6 +91,9 @@ void game_init(game *game) {
 dir DIRS[4] = { UP, DOWN, LEFT, RIGHT };
 
 game_loop_result update_player(game *game, dynarray *input) {
+  if (game->player.pos.y >= GAME_HEIGHT)
+    game->player.hitpoints = 0;
+
   game->player.movement_timer -= 1.0 / 60.0;
   game->player.projectile_timer -= 1.0 / 60.0;
 
