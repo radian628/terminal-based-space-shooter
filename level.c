@@ -13,6 +13,7 @@ void parseFile(char *filename, game *g) {
     g->level->height = 0;
     if (f == NULL) {
         printf("Error opening file %s\n", filename);
+        g->level = NULL;
         return;
     }
     // Count number of lines
@@ -48,6 +49,7 @@ void parseFile(char *filename, game *g) {
         }
         else {
             printf("Unknown command: %s\n", cmd);
+            g->level = NULL;
             return;
         }
         memset(buffer, ' ', buffer_size);
@@ -66,6 +68,7 @@ void parseFile(char *filename, game *g) {
     char* temp = realloc(buffer, g->level->width);
     if(temp == NULL) {
         printf("Failed to realloc\n");
+        g->level = NULL;
         return;
     } else {
         buffer = temp;
