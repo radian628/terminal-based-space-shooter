@@ -6,13 +6,14 @@
 #include "game.h"
 
 
-parseFile(char *filename, game *g) {
+void parseFile(char *filename, game *g) {
     g->level = malloc(sizeof(struct level));
     FILE *f = fopen(filename, "r");
     g->level->height = 0;
     if (f == NULL) {
         printf("Error opening file %s\n", filename);
-        return NULL;
+        g->level = NULL;
+        return;
     }
     // Count number of lines
     int ch=0;
@@ -47,7 +48,8 @@ parseFile(char *filename, game *g) {
         }
         else {
             printf("Unknown command: %s\n", cmd);
-            return NULL;
+            g->level = NULL;
+            return;
         }
         memset(buffer, ' ', buffer_size);
         line_len = getline(&buffer, &buffer_size, f);
@@ -65,7 +67,8 @@ parseFile(char *filename, game *g) {
     char* temp = realloc(buffer, g->level->width);
     if(temp == NULL) {
         printf("Failed to realloc\n");
-        return NULL;
+        g->level = NULL;
+        return;
     } else {
         buffer = temp;
     }
@@ -117,7 +120,7 @@ parseFile(char *filename, game *g) {
                     e.time_until_fire = 0.3;
                     e.hitpoints = 3;
                     e.damage_animation_frames_remaining = 0;
-                    dynarray_push(g->enemies, &e);
+                    da_append(g->enemies, &e);
                     break;
                 }
                 case '~': {
@@ -128,7 +131,7 @@ parseFile(char *filename, game *g) {
                     e.time_until_fire = 0;
                     e.hitpoints = 1;
                     e.damage_animation_frames_remaining = 0;
-                    dynarray_push(g->enemies, &e);
+                    da_append(g->enemies, &e);
                     break;
                 }
                 case '?': {
@@ -139,7 +142,7 @@ parseFile(char *filename, game *g) {
                     e.time_until_fire = 0.3;
                     e.hitpoints = 3;
                     e.damage_animation_frames_remaining = 0;
-                    dynarray_push(g->enemies, &e);
+                    da_append(g->enemies, &e);
                 }
                 default:
                     g->level->statics_map[i * g->level->width + k] = 0;
