@@ -59,6 +59,8 @@ struct level* parseFile(char *filename) {
         }
         cmd = strtok(buffer, " ");
     }
+    //Trailing Thingamabob
+    lvl->height--;
 
     // It breaks when I take out this debug statement. I'm going to sleep.
     printf("Width: %d, Height: %d\n", lvl->width, lvl->height);
@@ -113,6 +115,12 @@ struct level* parseFile(char *filename) {
                     break;
             }
         }
+    }
+    for(int i = 0; i < lvl->height; i++) {
+        for(int j = 0; j < lvl->width; j++) {
+            printf("%d ", lvl->statics_bitmap[i * lvl->width + j]);
+        }
+        printf("\n");
     }
     fclose(f);
     return lvl;
