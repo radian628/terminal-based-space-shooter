@@ -244,12 +244,6 @@ void print_screen(int min_width, int min_height, game *game) {
         4 + i, 0
       );
     }
-
-    if (is_player_intersecting_level(game)) {
-      draw_multichar(next_buffer, width, height, "interesecting!", 0, 0);
-    } else {
-      draw_multichar(next_buffer, width, height, "not intersecting!", 0, 0);
-    }
   }
 
   // Copy buffer changes to screen & fflush it

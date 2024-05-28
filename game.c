@@ -38,10 +38,10 @@ int in_rect(int test_x, int test_y, int x, int y, int w, int h) {
   return between(test_x, x, x + w) && between(test_y, y, y + h);
 }
 
-int is_player_intersecting_level(game *game) {
+int is_position_intersecting_level(game *game, ivec2 pos) {
   level *level = game->level;
-  int x = game->player.pos.x;
-  int y = game->player.pos.y - (int)game->level_progress;
+  int x = pos.x;
+  int y = pos.y - (int)game->level_progress;
   if (
     x < 0 || y < 0 || x >= level->width || y >= level->height
   ) {
@@ -54,6 +54,10 @@ int is_player_intersecting_level(game *game) {
 
   // odd -> takes up space
   return block != 0;
+}
+
+int is_player_intersecting_level(game *game) {
+  return is_position_intersecting_level(game, game->player.pos);
 }
 
 void game_init(game *game) {
@@ -167,6 +171,10 @@ void update_player_projectiles(game *game) {
         break;
       }
     }
+
+    if (is_position_intersecting_level(game, pp->pos)) {
+      pp->alive = 0;
+    }
   }
 
   da_filter(
@@ -200,6 +208,10 @@ void update_enemy_projectiles(game *game) {
       ep->alive = 0;
       game->player.hitpoints -= ep->damage;
       continue;
+    }
+
+    if (is_position_intersecting_level(game, ep->pos)) {
+      ep->alive = 0;
     }
   }
 
