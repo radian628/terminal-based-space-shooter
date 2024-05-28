@@ -214,19 +214,6 @@ void print_screen(int min_width, int min_height, game *game) {
       }
     }
 
-    // draw hud
-    draw_multichar(
-      next_buffer, width, height,
-      "HP: ", 0, 0
-    );
-    for (int i = 0; i < 20; i++) {
-      draw_multichar(
-        next_buffer, width, height,
-        i >= game->player.hitpoints ? "_" : "#",
-        4 + i, 0
-      );
-    }
-
     // draw level
     // draw_multichar(
     //   next_buffer, width, height,
@@ -243,6 +230,19 @@ void print_screen(int min_width, int min_height, game *game) {
           );
         }
       }
+    }
+
+    // draw hud
+    draw_multichar(
+      next_buffer, width, height,
+      "HP: ", 0, 0
+    );
+    for (int i = 0; i < 20; i++) {
+      draw_multichar(
+        next_buffer, width, height,
+        i >= game->player.hitpoints ? "_" : "|",
+        4 + i, 0
+      );
     }
   }
 

@@ -30,6 +30,14 @@ ivec2 add(ivec2 a, ivec2 b) {
   return v;
 }
 
+int between(int x, int lo, int hi) {
+  return x >= lo && x < hi;
+}
+
+int in_rect(int test_x, int test_y, int x, int y, int w, int h) {
+  return between(test_x, x, x + w) && between(test_y, y, y + h);
+}
+
 void game_init(game *game) {
   game->player.pos.x = 0;
   game->player.pos.y = 0;
@@ -118,7 +126,11 @@ void update_player_projectiles(game *game) {
     pp->pos.y--;
     if (pp->pos.y < 0) pp->alive = 0;
     da_iterate(game->enemies, enemy, e) {
-      if (e->pos.x == pp->pos.x && e->pos.y == pp->pos.y) {
+      int hit = in_rect(
+        pp->pos.x, pp->pos.y,
+        e->pos.x - 2, e->pos.y - 1, 5, 3
+      );
+      if (hit) {
         e->hitpoints--;
         e->damage_animation_frames_remaining = 6;
         pp->alive = 0;
@@ -209,7 +221,18 @@ int run_game_loop(game *game, dynarray *input) {
   update_enemy_projectiles(game);
   update_enemies(game);
 
+  int old_progress = (int)game->level_progress;
   game->level_progress += SCROLL_SPEED / 60.0 * 0.5;
+  int advanced = old_progress != (int)game->level_progress;
+
+  if (advanced) {
+    da_iterate(game->enemies, enemy, e) {
+      e->pos.y++;
+    }
+    da_iterate(game->enemy_projectiles, enemy_projectile, e) {
+      e->pos.y++;
+    }
+  }
   
   return 0;
 }
