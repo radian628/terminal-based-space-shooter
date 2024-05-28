@@ -1,5 +1,6 @@
 #pragma once
 #include "dynarray.h"
+#include "level.h"
 
 enum dir {
   UP, DOWN, LEFT, RIGHT
@@ -28,6 +29,7 @@ typedef struct player_projectile player_projectile;
 struct game {
   player player;
   dynarray *player_projectiles;
+  level *level;
 };
 typedef struct game game;
 
