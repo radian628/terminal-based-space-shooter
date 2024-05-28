@@ -10,11 +10,7 @@
 
 int main() {
   game game;
-  game.player.pos.x = 0;
-  game.player.pos.y = 0;
-  game.player.dir = RIGHT;
-  game.player.movement_timer = 0.1;
-  game.player_projectiles = da_create(sizeof(player_projectile));
+  game_init(&game);
 
   disable_echo_and_canonical();
   init_screen();
