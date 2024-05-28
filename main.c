@@ -15,6 +15,8 @@ int main( int argc, char *argv[] ) {
   game_init(&game);
   if(argc > 1) {
     game.level = parseFile(argv[1]);
+    game.level_progress
+      = -(double)game.level->height;
   }else{
     printf("No level specified.\n");
     exit(1);

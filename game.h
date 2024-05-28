@@ -59,6 +59,7 @@ struct game {
   level *level;
   dynarray *enemies;
   dynarray *enemy_projectiles;
+  double level_progress;
 };
 typedef struct game game;
 

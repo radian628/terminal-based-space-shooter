@@ -226,7 +226,24 @@ void print_screen(int min_width, int min_height, game *game) {
         4 + i, 0
       );
     }
-    
+
+    // draw level
+    // draw_multichar(
+    //   next_buffer, width, height,
+    //   game->level->statics_map, 0, game->level_progress
+    // );
+    level *level = game->level;
+    for (int y = 0; y < level->height; y++) {
+      for (int x = 0; x < level->width; x++) {
+        int i = y * level->width + x;
+        if (level->statics_map[i]) {
+          draw_multichar(
+            next_buffer, width, height,
+            "#", x, y + (int)game->level_progress
+          );
+        }
+      }
+    }
   }
 
   // Copy buffer changes to screen & fflush it

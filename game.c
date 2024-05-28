@@ -39,6 +39,7 @@ void game_init(game *game) {
   game->player_projectiles = da_create(sizeof(player_projectile));
   game->enemies = da_create(sizeof(enemy));
   game->enemy_projectiles = da_create(sizeof(enemy_projectile));
+  game->level_progress = 0.0;
 
   enemy e;
   e.type = FOUR_DIRECTIONS;
@@ -207,6 +208,8 @@ int run_game_loop(game *game, dynarray *input) {
   update_player_projectiles(game);
   update_enemy_projectiles(game);
   update_enemies(game);
+
+  game->level_progress += SCROLL_SPEED / 60.0 * 0.5;
   
   return 0;
 }
