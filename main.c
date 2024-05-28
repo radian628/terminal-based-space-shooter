@@ -25,7 +25,8 @@ int main( int argc, char *argv[] ) {
   init_screen();
   // repeatedly poll for input
   while (1) {
-    print_screen(80, 30, &game);
+    // Min height? 30 for now.
+    print_screen(game.level->width, 30, &game);
     usleep(1000000 / 60);
 
     // get all input from stdin
