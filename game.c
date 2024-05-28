@@ -38,6 +38,24 @@ int in_rect(int test_x, int test_y, int x, int y, int w, int h) {
   return between(test_x, x, x + w) && between(test_y, y, y + h);
 }
 
+int is_player_intersecting_level(game *game) {
+  level *level = game->level;
+  int x = game->player.pos.x;
+  int y = game->player.pos.y - (int)game->level_progress;
+  if (
+    x < 0 || y < 0 || x >= level->width || y >= level->height
+  ) {
+    return 0;
+  }
+
+  int i = y * level->width + x;
+
+  char block = level->statics_map[i];
+
+  // odd -> takes up space
+  return block != 0;
+}
+
 void game_init(game *game) {
   game->player.pos.x = 0;
   game->player.pos.y = 0;
@@ -92,10 +110,22 @@ int update_player(game *game, dynarray *input) {
     da_append(game->player_projectiles, &proj);
   }
 
+  // make sure we're not intersecting a wall   
+  while (is_player_intersecting_level(game)) {
+    game->player.pos.y++;
+  }
+
   if (game->player.movement_timer < 0.0) {
+    ivec2 old_pos = game->player.pos;
     game->player.pos = add(game->player.pos, dir_to_ivec2(
       game->player.dir
     ));
+    if (is_player_intersecting_level(game)) {
+      game->player.pos = old_pos;
+    }
+    while (is_player_intersecting_level(game)) {
+      game->player.pos.y++;
+    }
     switch (game->player.dir) {
       case UP:
       case DOWN:

@@ -66,3 +66,5 @@ typedef struct game game;
 int run_game_loop(game *game, dynarray *input);
 
 void game_init(game *game);
+
+int is_player_intersecting_level(game *game);
