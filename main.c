@@ -8,6 +8,7 @@
 #include "display.h"
 #include "game.h"
 #include "config.h"
+#include "level.h"
 
 
 int main( int argc, char *argv[] ) {
