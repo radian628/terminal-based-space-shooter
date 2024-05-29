@@ -17,7 +17,10 @@ int main( int argc, char *argv[] ) {
   game_loop_result result; 
   game_init(&game);
   if(argc > 1) {
+    struct winsize w;
+    ioctl(0, TIOCGWINSZ, &w);
     parseFile(argv[1], &game);
+    game->level_progress -= w.ws_row;
   }else{
     printf("No level specified.\n");
     exit(1);
