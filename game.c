@@ -120,14 +120,14 @@ void game_init(game *game) {
   game->enemy_projectiles = da_create(sizeof(enemy_projectile));
   game->level_progress = 0.0;
 
-  enemy e;
-  e.type = FOUR_DIRECTIONS;
-  e.pos.x = 20;
-  e.pos.y = 10;
-  e.time_until_fire = 0.3;
-  e.hitpoints = 3;
-  e.damage_animation_frames_remaining = 0;
-  da_append(game->enemies, &e);
+  // enemy e;
+  // e.type = FOUR_DIRECTIONS;
+  // e.pos.x = 20;
+  // e.pos.y = 10;
+  // e.time_until_fire = 0.3;
+  // e.hitpoints = 3;
+  // e.damage_animation_frames_remaining = 0;
+  // da_append(game->enemies, &e);
 }
 
 dir DIRS[4] = { UP, DOWN, LEFT, RIGHT };
