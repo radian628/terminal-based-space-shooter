@@ -2,6 +2,8 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/ioctl.h>
+#include <asm/termbits.h>
 
 #include "dynarray.h"
 #include "input.h"
@@ -20,7 +22,7 @@ int main( int argc, char *argv[] ) {
     struct winsize w;
     ioctl(0, TIOCGWINSZ, &w);
     parseFile(argv[1], &game);
-    game->level_progress -= w.ws_row;
+    game.level_progress -= w.ws_row;
   }else{
     printf("No level specified.\n");
     exit(1);
