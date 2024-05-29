@@ -259,20 +259,23 @@ void update_enemy(game *game, enemy *e) {
     }
   } else if (e->type == DOWN_SHOOTER) {
     if (e->time_until_fire < 0) {
-      e->time_until_fire = 0.5;
+      e->time_until_fire = 0.3;
       enemy_projectile proj;
       proj.pos = e->pos;
       proj.vel.x = 0;
       proj.vel.y = 1;
       proj.size = 1;
-      proj.movement_interval = 0.0125;
+      proj.movement_interval = 0.05;
       proj.time_until_move = 0.0;
       proj.alive = 1;
       proj.damage = 3;
       da_append(game->enemy_projectiles, &proj);
     }
+    if (e->time_until_move < 0) {
+      e->time_until_move = 0.17;
+      e->pos = add(e->pos, dir_to_ivec2(e->dir));
+    }
 
-    e->pos = add(e->pos, dir_to_ivec2(e->dir));
     if (is_position_intersecting_level(game, e->pos)) {
       e->dir = e->dir == LEFT ? RIGHT : LEFT;
       e->pos = add(e->pos, dir_to_ivec2(e->dir));
@@ -280,6 +283,7 @@ void update_enemy(game *game, enemy *e) {
   }
   
   e->time_until_fire -= 1.0 / 60.0;
+  e->time_until_move -= 1.0 / 60.0;
   e->damage_animation_frames_remaining--;
 }
 

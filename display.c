@@ -204,10 +204,17 @@ void print_screen(int min_width, int min_height, game *game) {
 
     // draw enemies
     da_iterate(game->enemies, enemy, e) {
-      draw_multichar(
-        next_buffer, width, height,
-        "  |  \n--F--\n  |  ", e->pos.x - 2, e->pos.y - 1
-      );
+      if (e->type == FOUR_DIRECTIONS) {
+        draw_multichar(
+          next_buffer, width, height,
+          "  |  \n--F--\n  |  ", e->pos.x - 2, e->pos.y - 1
+        );
+      } else if (e->type == DOWN_SHOOTER) {
+        draw_multichar(
+          next_buffer, width, height,
+          "#####\n | | \n | | ", e->pos.x - 2, e->pos.y - 1
+        );
+      }
 
       if (e->damage_animation_frames_remaining > 0) {
         set_color_rect(
