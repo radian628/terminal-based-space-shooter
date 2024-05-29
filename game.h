@@ -20,6 +20,12 @@ struct ivec2 {
 };
 typedef struct ivec2 ivec2;
 
+struct vec2 {
+  double x;
+  double y;
+};
+typedef struct vec2 vec2;
+
 struct player {
   ivec2 pos;
   dir dir;
@@ -54,11 +60,9 @@ struct enemy {
 typedef struct enemy enemy;
 
 struct enemy_projectile {
-  ivec2 pos;
-  ivec2 vel;
+  vec2 pos;
+  vec2 vel;
   size_t size;
-  double movement_interval;
-  double time_until_move;
   int damage;
   int alive;
 };

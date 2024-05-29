@@ -198,7 +198,7 @@ void print_screen(int min_width, int min_height, game *game) {
     ) {
       draw_multichar(
         next_buffer, width, height,
-        "*", ep->pos.x, ep->pos.y
+        "*", (int)ep->pos.x, (int)ep->pos.y
       );
     }
 

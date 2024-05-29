@@ -19,6 +19,32 @@ ivec2 dir_to_ivec2(dir dir) {
   return v;
 }
 
+vec2 ivec2_to_vec2(ivec2 v) {
+  vec2 v2;
+  v2.x = (double)v.x;
+  v2.y = (double)v.y;
+  return v2;
+}
+
+ivec2 vec2_to_ivec2(vec2 v) {
+  ivec2 v2;
+  v2.x = (int)v.x;
+  v2.y = (int)v.y;
+  return v2;
+}
+
+vec2 dir_to_vec2(dir dir) {
+  vec2 v2 = ivec2_to_vec2(dir_to_ivec2(dir));
+  v2.y *= 0.5;
+  return v2;
+}
+
+vec2 scalar_mul(vec2 v, double s) {
+  v.x *= s;
+  v.y *= s;
+  return v;
+}
+
 double dir_multiplier(dir dir) {
   if (dir == UP || dir == DOWN) return 2.0;
   return 1.0;
@@ -26,6 +52,13 @@ double dir_multiplier(dir dir) {
 
 ivec2 add(ivec2 a, ivec2 b) {
   ivec2 v;
+  v.x = a.x + b.x;
+  v.y = a.y + b.y;
+  return v;
+}
+
+vec2 add_vec2(vec2 a, vec2 b) {
+  vec2 v;
   v.x = a.x + b.x;
   v.y = a.y + b.y;
   return v;
@@ -62,6 +95,12 @@ int is_position_intersecting_level(game *game, ivec2 pos) {
 
   // odd -> takes up space
   return block != 0;
+}
+
+int is_vec2_pos_intersecting_level(game *game, vec2 pos) {
+  return is_position_intersecting_level(
+    game, vec2_to_ivec2(pos)
+  );
 }
 
 int is_player_intersecting_level(game *game) {
@@ -207,21 +246,17 @@ void update_enemy_projectiles(game *game) {
   da_iterate(
     game->enemy_projectiles, enemy_projectile, ep
   ) {
-    if (ep->time_until_move < 0.0)  {
-      ep->pos = add(ep->pos, ep->vel);
-      ep->time_until_move = ep->movement_interval;
-    }
-    ep->time_until_move -= 1.0 / 60.0;
+    ep->pos = add_vec2(ep->pos, ep->vel);
 
     // collision with player
-    if (ep->pos.x == game->player.pos.x 
-    && ep->pos.y == game->player.pos.y) {
+    if ((int)ep->pos.x == game->player.pos.x 
+    && (int)ep->pos.y == game->player.pos.y) {
       ep->alive = 0;
       game->player.hitpoints -= ep->damage;
       continue;
     }
 
-    if (is_position_intersecting_level(game, ep->pos)) {
+    if (is_vec2_pos_intersecting_level(game, ep->pos)) {
       ep->alive = 0;
     }
   }
@@ -247,11 +282,12 @@ void update_enemy(game *game, enemy *e) {
       e->time_until_fire = 0.6;
       for (size_t i = 0; i < 4; i++) {
         enemy_projectile proj;
-        proj.pos = e->pos;
-        proj.vel = dir_to_ivec2(DIRS[i]);
+        proj.pos = ivec2_to_vec2(e->pos);
+        proj.vel = scalar_mul(
+          dir_to_vec2(DIRS[i]),
+          0.4
+        );
         proj.size = 1;
-        proj.movement_interval = 0.025 * dir_multiplier(DIRS[i]);
-        proj.time_until_move = 0.0;
         proj.alive = 1;
         proj.damage = 4;
         da_append(game->enemy_projectiles, &proj);
@@ -261,12 +297,10 @@ void update_enemy(game *game, enemy *e) {
     if (e->time_until_fire < 0) {
       e->time_until_fire = 0.3;
       enemy_projectile proj;
-      proj.pos = e->pos;
-      proj.vel.x = 0;
-      proj.vel.y = 1;
+      proj.pos = ivec2_to_vec2(e->pos);
+      proj.vel.x = 0.0;
+      proj.vel.y = 0.5;
       proj.size = 1;
-      proj.movement_interval = 0.05;
-      proj.time_until_move = 0.0;
       proj.alive = 1;
       proj.damage = 3;
       da_append(game->enemy_projectiles, &proj);
