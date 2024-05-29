@@ -17,6 +17,7 @@
 int main( int argc, char *argv[] ) {
 
   game game;
+  game.level_progress = 0;
   game_loop_result result; 
   game_init(&game);
   if(argc > 1) {

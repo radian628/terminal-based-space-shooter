@@ -116,7 +116,7 @@ void parseFile(char *filename, game *g) {
                 case 'F': {
                     enemy e;
                     e.pos.x = k;
-                    e.pos.y = i - g->level->height;
+                    e.pos.y = i; //- g->level->height;
                     e.type = FOUR_DIRECTIONS;
                     e.time_until_fire = 0.3;
                     e.hitpoints = 3;
@@ -128,7 +128,7 @@ void parseFile(char *filename, game *g) {
                 case '~': {
                     enemy e;
                     e.pos.x = k;
-                    e.pos.y = i - g->level->height;
+                    e.pos.y = i;// - g->level->height;
                     e.type = FOLLOWER;
                     e.time_until_fire = 0;
                     e.hitpoints = 1;
@@ -139,7 +139,7 @@ void parseFile(char *filename, game *g) {
                 case '?': {
                     enemy e;
                     e.pos.x = k;
-                    e.pos.y = i - g->level->height;
+                    e.pos.y = i;// - g->level->height;
                     e.type = DOWN_SHOOTER;
                     e.time_until_fire = 0.3;
                     e.hitpoints = 3;
