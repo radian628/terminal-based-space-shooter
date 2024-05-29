@@ -2,6 +2,8 @@
 #include "config.h"
 #include "level.h"
 
+#include <math.h>
+
 dir key_to_dir(char key) {
   switch (key) {\
     case 'w': return UP;
@@ -72,13 +74,13 @@ int in_rect(int test_x, int test_y, int x, int y, int w, int h) {
   return between(test_x, x, x + w) && between(test_y, y, y + h);
 }
 
-int is_position_intersecting_level(game *game, ivec2 pos) {
+int is_position_intersecting_level(game *game, ivec2 pos, int ignore_top) {
   level *level = game->level;
   int x = pos.x;
   int y = pos.y - (int)game->level_progress;
   if (
     x < 0 || x >= level->width
-    || pos.y < 0 || pos.y > GAME_HEIGHT
+    || (pos.y < 0 && !ignore_top) || pos.y > GAME_HEIGHT
   ) {
     return 1;
   }
@@ -97,14 +99,14 @@ int is_position_intersecting_level(game *game, ivec2 pos) {
   return block != 0;
 }
 
-int is_vec2_pos_intersecting_level(game *game, vec2 pos) {
+int is_vec2_pos_intersecting_level(game *game, vec2 pos, int ignore_top) {
   return is_position_intersecting_level(
-    game, vec2_to_ivec2(pos)
+    game, vec2_to_ivec2(pos), ignore_top 
   );
 }
 
 int is_player_intersecting_level(game *game) {
-  return is_position_intersecting_level(game, game->player.pos);
+  return is_position_intersecting_level(game, game->player.pos, 0);
 }
 
 void game_init(game *game) {
@@ -222,7 +224,7 @@ void update_player_projectiles(game *game) {
       }
     }
 
-    if (is_position_intersecting_level(game, pp->pos)) {
+    if (is_position_intersecting_level(game, pp->pos, 1)) {
       pp->alive = 0;
     }
   }
@@ -256,7 +258,7 @@ void update_enemy_projectiles(game *game) {
       continue;
     }
 
-    if (is_vec2_pos_intersecting_level(game, ep->pos)) {
+    if (is_vec2_pos_intersecting_level(game, ep->pos, 1)) {
       ep->alive = 0;
     }
   }
@@ -310,9 +312,26 @@ void update_enemy(game *game, enemy *e) {
       e->pos = add(e->pos, dir_to_ivec2(e->dir));
     }
 
-    if (is_position_intersecting_level(game, e->pos)) {
+    if (is_position_intersecting_level(game, e->pos, 1)) {
       e->dir = e->dir == LEFT ? RIGHT : LEFT;
       e->pos = add(e->pos, dir_to_ivec2(e->dir));
+    }
+  } else if (e->type == FOLLOWER) {
+    if (e->time_until_fire < 0) {
+      e->time_until_fire = 0.4;
+      enemy_projectile proj;
+      proj.pos = ivec2_to_vec2(e->pos);
+      proj.vel.x = e->pos.x - game->player.pos.x;
+      proj.vel.y = e->pos.y - game->player.pos.y;
+      double mag = sqrt(proj.vel.x * proj.vel.x + proj.vel.y * proj.vel.y);
+      proj.vel.x /= -mag;
+      proj.vel.y /= -mag;
+      proj.vel.x *= 0.6;
+      proj.vel.y *= 0.6;
+      proj.size = 1;
+      proj.alive = 1;
+      proj.damage = 5;
+      da_append(game->enemy_projectiles, &proj);
     }
   }
   
