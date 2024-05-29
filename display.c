@@ -214,6 +214,11 @@ void print_screen(int min_width, int min_height, game *game) {
           next_buffer, width, height,
           "#####\n | | \n | | ", e->pos.x - 2, e->pos.y - 1
         );
+      } else if (e->type == FOLLOWER) {
+        draw_multichar(
+          next_buffer, width, height,
+          "  ^  \n<=O=>\n  v  ", e->pos.x - 2, e->pos.y - 1
+        );
       }
 
       if (e->damage_animation_frames_remaining > 0) {

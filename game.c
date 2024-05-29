@@ -2,6 +2,8 @@
 #include "config.h"
 #include "level.h"
 
+#include <math.h>
+
 dir key_to_dir(char key) {
   switch (key) {\
     case 'w': return UP;
@@ -313,6 +315,23 @@ void update_enemy(game *game, enemy *e) {
     if (is_position_intersecting_level(game, e->pos)) {
       e->dir = e->dir == LEFT ? RIGHT : LEFT;
       e->pos = add(e->pos, dir_to_ivec2(e->dir));
+    }
+  } else if (e->type == FOLLOWER) {
+    if (e->time_until_fire < 0) {
+      e->time_until_fire = 0.4;
+      enemy_projectile proj;
+      proj.pos = ivec2_to_vec2(e->pos);
+      proj.vel.x = e->pos.x - game->player.pos.x;
+      proj.vel.y = e->pos.y - game->player.pos.y;
+      double mag = sqrt(proj.vel.x * proj.vel.x + proj.vel.y * proj.vel.y);
+      proj.vel.x /= -mag;
+      proj.vel.y /= -mag;
+      proj.vel.x *= 0.6;
+      proj.vel.y *= 0.6;
+      proj.size = 1;
+      proj.alive = 1;
+      proj.damage = 5;
+      da_append(game->enemy_projectiles, &proj);
     }
   }
   
