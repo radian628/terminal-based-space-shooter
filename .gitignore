@@ -2,3 +2,6 @@
 tbss
 .vscode
 log
+
+zig-cache
+zig-out
