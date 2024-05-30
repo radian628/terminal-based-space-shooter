@@ -3,7 +3,13 @@ const fs = std.fs;
 const os = std.os.linux;
 const debug = std.debug;
 
+const display = @import("./display/display.zig");
+
 pub fn main() !void {
+    std.debug.print("\n");
+    const ws = display.getWinsize();
+    std.debug.print("winsize {d} {d}\n", .{ ws.ws_col, ws.ws_row });
+
     // get current terminal
     var tty: fs.File = try fs.cwd().openFile("/dev/tty", .{ .mode = .read_write });
     defer tty.close();
