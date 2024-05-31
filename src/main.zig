@@ -6,9 +6,17 @@ const debug = std.debug;
 const display = @import("./display/display.zig");
 
 pub fn main() !void {
-    std.debug.print("\n");
+    display.clear();
+
+    // allocate a buffer the size of the screen
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    const allocator = gpa.allocator();
     const ws = display.getWinsize();
-    std.debug.print("winsize {d} {d}\n", .{ ws.ws_col, ws.ws_row });
+    const displayBuffer = try allocator.alloc(u8, ws.ws_col * ws.ws_row);
+
+    // display a "your screen is too small!" message
+    // (to be changed later)
+    try display.printTooSmall(allocator, displayBuffer);
 
     // get current terminal
     var tty: fs.File = try fs.cwd().openFile("/dev/tty", .{ .mode = .read_write });
