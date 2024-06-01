@@ -107,8 +107,8 @@ pub fn PolymorphicSOA(comptime Shapes: type) type {
             @compileError("Column'" ++ col ++ "'does not exist.");
         }
 
-        pub fn get_array(soa: *Self, comptime col: []const u8) std.AutoArrayHashMap(usize, ColType(col)) {
-            return @field(soa.impl, col);
+        pub fn get_array(soa: *Self, comptime col: []const u8) *std.AutoArrayHashMap(KeyType, ColType(col)) {
+            return &@field(soa.impl, "map_" ++ col);
         }
     };
 }
@@ -136,6 +136,17 @@ test "Simple PolymorphicSOA example." {
         soa.get("b", id4).?.*,
         "foo bar",
     ));
+
+    const arr = soa.get_array("a");
+    try std.testing.expect(arr.contains(id1));
+    try std.testing.expect(arr.contains(id3));
+    try std.testing.expect(!arr.contains(id2));
+    try std.testing.expect(!arr.contains(id4));
+    const arr2 = soa.get_array("b");
+    try std.testing.expect(arr2.contains(id2));
+    try std.testing.expect(arr2.contains(id4));
+    try std.testing.expect(!arr2.contains(id1));
+    try std.testing.expect(!arr2.contains(id3));
 
     try std.testing.expect(soa.remove(id1));
     try std.testing.expect(soa.remove(id2));
