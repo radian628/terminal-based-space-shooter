@@ -2,6 +2,7 @@ const std = @import("std");
 const fs = std.fs;
 const os = std.os.linux;
 const debug = std.debug;
+const Multitable = @import("./data-structures/multitable.zig").Multitable;
 
 const display = @import("./display/display.zig");
 
@@ -11,6 +12,7 @@ pub fn main() !void {
     // allocate a buffer the size of the screen
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     const allocator = gpa.allocator();
+
     const ws = display.getWinsize();
     const displayBuffer = try allocator.alloc(u8, ws.ws_col * ws.ws_row);
 
