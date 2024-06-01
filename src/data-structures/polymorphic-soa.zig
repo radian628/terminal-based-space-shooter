@@ -1,7 +1,7 @@
 const std = @import("std");
 const Type = std.builtin.Type;
 
-const KeyType = u64;
+pub const KeyType = u64;
 
 pub fn PolymorphicSOAImpl(comptime Shapes: type) type {
     const shape_info = @typeInfo(Shapes).Struct;
@@ -107,7 +107,7 @@ pub fn PolymorphicSOA(comptime Shapes: type) type {
             @compileError("Column'" ++ col ++ "'does not exist.");
         }
 
-        pub fn get_array(soa: *Self, comptime col: []const u8) *std.AutoArrayHashMap(KeyType, ColType(col)) {
+        pub fn getArray(soa: *Self, comptime col: []const u8) *std.AutoArrayHashMap(KeyType, ColType(col)) {
             return &@field(soa.impl, "map_" ++ col);
         }
     };
@@ -137,12 +137,12 @@ test "Simple PolymorphicSOA example." {
         "foo bar",
     ));
 
-    const arr = soa.get_array("a");
+    const arr = soa.getArray("a");
     try std.testing.expect(arr.contains(id1));
     try std.testing.expect(arr.contains(id3));
     try std.testing.expect(!arr.contains(id2));
     try std.testing.expect(!arr.contains(id4));
-    const arr2 = soa.get_array("b");
+    const arr2 = soa.getArray("b");
     try std.testing.expect(arr2.contains(id2));
     try std.testing.expect(arr2.contains(id4));
     try std.testing.expect(!arr2.contains(id1));

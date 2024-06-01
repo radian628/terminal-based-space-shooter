@@ -3,6 +3,7 @@ const fs = std.fs;
 const os = std.os.linux;
 const debug = std.debug;
 const Multitable = @import("./data-structures/multitable.zig").Multitable;
+const input = @import("./game/input.zig");
 
 const display = @import("./display/display.zig");
 
@@ -36,17 +37,12 @@ pub fn main() !void {
 
     // repeatedly get chars from input
     while (true) {
-        // get input
-        var buffer: [1]u8 = undefined;
-        _ = try tty.read(&buffer);
+        const buf = try input.get_all_of_stdin(allocator);
+        defer buf.deinit();
 
-        // exit if input is 'x'
-        if (buffer[0] == 'x') {
-            break;
-        }
+        try tty.writer().print("got input {s}\n", .{buf.items});
 
-        // acknowledge the input; print it to console
-        try tty.writer().print("got input: {s}\n", .{buffer});
+        std.time.sleep(1000000000 / 60);
     }
 
     // re-enable echo and icanon

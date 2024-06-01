@@ -1,9 +1,47 @@
 const std = @import("std");
+const Multitable = @import("../data-structures/multitable.zig").Multitable;
+const PolymorphicSOA = @import("../data-structures/polymorphic-soa.zig").PolymorphicSOA;
+const IDList = @import("../data-structures//id-list.zig").IDList;
 
 const Game = struct {
-    drawables: std.AutoArrayHashMap(u64, Drawable),
-    positions: std.AutoArrayHashMap(u64, Position),
+    current_time: f64,
+    drawables: IDList(Drawable),
+    timer: IDList(Timer),
+    enemy_special: PolymorphicSOA(struct {
+        four_directions: struct {
+            fire_timer: u64,
+        },
+        down: struct {
+            is_moving_left: bool,
+            fire_timer: u64,
+        },
+        follow: struct {
+            fire_timer: u64,
+        },
+    }),
+    enemy_general: IDList(EnemyGeneral),
+    enemies: Multitable(struct {
+        enemy_data: u64,
+        drawable: u64,
+        hitbox: u64,
+    }),
     player: Player,
+    player_projectiles: IDList(Projectile),
+    enemy_projectiles: IDList(Projectile),
+};
+
+const Timer = struct {
+    interval: f64,
+    runs_out_at: f64,
+
+    // if the timer runs out
+    pub fn check(timer: *Timer, game: *Game) bool {
+        if (timer.runs_out_at > game.current_time) {
+            timer.runs_out_at = game.current_time + timer.interval;
+            return true;
+        }
+        return false;
+    }
 };
 
 const Drawable = struct {
@@ -12,35 +50,39 @@ const Drawable = struct {
     y: isize,
 };
 
-const Position = struct {
+const Player = struct {
+    hitpoints: u64,
+
     x: f64,
     y: f64,
 };
 
-const Player = struct {
-    pos_id: u64,
-    hitpoints: u64,
+const Health = struct {
+    max: u64,
+    current: u64,
 };
 
-const ProjectileShooter = struct {
-    interval: f64,
-    fire: fn (
-        game: Game,
-    ) void,
+const EnemyGeneral = struct {
+    // position
+    x: f64,
+    y: f64,
+
+    // hitbox
+    left: u64,
+    right: u64,
+    top: u64,
+    bottom: u64,
+
+    // HP
+    health: Health,
 };
 
-const Health = struct { hitpoints: u64, max_hitpoints: u64 };
+const Projectile = struct {
+    // position and velocity
+    x: f64,
+    y: f64,
+    dx: f64,
+    dy: f64,
 
-const EnemyTag = enum { four_directions, down, follow };
-
-const EnemyData = union(EnemyTag) {
-    four_directions: struct {},
-    down: struct { is_moving_left: bool },
-    follow: struct {},
-};
-
-const Enemy = struct {
-    data: EnemyData,
-    hp_id: u64,
-    pos_id: u64,
+    damage: u64,
 };
